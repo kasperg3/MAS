@@ -25,8 +25,9 @@ Stat = require "ranalib_statistic"
 Move = require "ranalib_movement"
 Collision = require "ranalib_collision"
 Agent = require "ranalib_agent"
+Shared = require "ranalib_shared"
 
-SPEED = 1
+SPEED = Shared.getNumber(3)
 
 -- Init of the lua frog, function called upon initilization of the LUA auton.
 function initializeAgent()
