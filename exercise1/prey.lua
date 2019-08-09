@@ -1,25 +1,3 @@
---begin_license--
---
---Copyright 	2013 - 2016 	Søren Vissing Jørgensen.
---
---This file is part of RANA.
---
---RANA is free software: you can redistribute it and/or modify
---it under the terms of the GNU General Public License as published by
---the Free Software Foundation, either version 3 of the License, or
---(at your option) any later version.
---
---RANA is distributed in the hope that it will be useful,
---but WITHOUT ANY WARRANTY; without even the implied warranty of
---MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---GNU General Public License for more details.
---
---You should have received a copy of the GNU General Public License
---along with RANA.  If not, see <http://www.gnu.org/licenses/>.
---
-----end_license--
-
---The following global values are set via the simulation core:
 -- ------------------------------------
 -- IMMUTABLES.
 -- ------------------------------------
@@ -46,11 +24,9 @@ Event = require "ranalib_event"
 Stat = require "ranalib_statistic"
 Move = require "ranalib_movement"
 Collision = require "ranalib_collision"
+Agent = require "ranalib_agent"
 
-above_count = 1
-below_count = 1
-speed = 10
-Displacement = 1
+SPEED = 1
 
 -- Init of the lua frog, function called upon initilization of the LUA auton.
 function initializeAgent()
@@ -69,7 +45,10 @@ end
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	
-	
+	if eventDescription == "Eaten" then 
+		say("Agent #: " .. ID .. " got eaten by Agent #: " .. sourceID )
+		Agent.removeAgent(ID)
+	end
 	
 end
 
@@ -82,7 +61,7 @@ function takeStep()
 
 	--say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
 	if Moving == false then 	
-		Move.toRandom(1) 
+		Move.toRandom(SPEED) 
 	end	
 
 	Collision.updatePosition(PositionX, PositionY)

@@ -1,26 +1,3 @@
---begin_license--
---
---Copyright 	2013 - 2016 	Søren Vissing Jørgensen.
---
---This file is part of RANA.
---
---RANA is free software: you can redistribute it and/or modify
---it under the terms of the GNU General Public License as published by
---the Free Software Foundation, either version 3 of the License, or
---(at your option) any later version.
---
---RANA is distributed in the hope that it will be useful,
---but WITHOUT ANY WARRANTY; without even the implied warranty of
---MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
---GNU General Public License for more details.
---
---You should have received a copy of the GNU General Public License
---along with RANA.  If not, see <http://www.gnu.org/licenses/>.
---
-----end_license--
-
---The following global values are set via the simulation core:
--- ------------------------------------
 -- IMMUTABLES.
 -- ------------------------------------
 -- ID -- id of the agent.
@@ -49,13 +26,8 @@ Agent = require "ranalib_agent"
 Collision = require "ranalib_collision"
 Shared = require "ranalib_shared"
 
-above_count = 1
-below_count = 1
-speed = 10
-Displacement = 1
 STEP_RESOLUTION = 1
-SPEED = 2
-MAX_PREDATOR = Shared.getNumber(0)
+SPEED = 10
 
 -- Init of the lua frog, function called upon initilization of the LUA auton.
 function initializeAgent()
@@ -67,10 +39,10 @@ function initializeAgent()
 	description = "predator"
 	GridMove = true
 	Moving = false
-	--Change Color
 	Agent.changeColor{r=255, g=0, b=0}
 	withinRangeOfPrey = false
 	counter = 0
+	STEPS = 20
 	l_debug("POS :" .. PositionY .. " , " .. PositionX)
 end
 
@@ -92,43 +64,55 @@ function takeStep()
 		end	
 
 		if withinRangeOfPrey == false then
-			local destX = 0
-			local destY = 0
-			randomInt = Stat.randomInteger(1,2)
-			if  randomInt == 1 then
+			local destX = PositionX
+			local destY = PositionY
+			
+			if counter % STEPS == 0 then
+				randomX = Stat.randomInteger(0,2)
+				randomY = Stat.randomInteger(0,2)
+				counter = 0
+			end
+
+			counter = counter + 1
+
+			if  randomX == 1 then 
 				destX = PositionX - 1
-			elseif randomInt == 2 then
+			elseif randomX == 2 then 
 				destX = PositionX + 1
 			end
 
-			randomInt = Stat.randomInteger(1,2)
-			if  randomInt == 1 then
+			if  randomY == 1 then 
 				destY = PositionY - 1
-			elseif randomInt == 2 then
+			elseif randomY == 2 then 
 				destY = PositionY + 1
 			end
 			
-			if PositionX > ENV_WIDTH then 
-				destX = 0 
-			end
-			if PositionY > ENV_HEIGHT then
-				destY = 0	
-			end
-
-			if PositionX < 0 then 
-				destX = ENV_WIDTH 
-			end
-			if PositionY < 0 then
-				destY = ENV_HEIGHT
-			end
-			Move.to{x=destX,y=destY,speed=10}
+			--Wrap around
+			if PositionX > ENV_WIDTH then destX = 0 end
+			if PositionY > ENV_HEIGHT then destY = 0 end
+			if PositionX < 0 then destX = ENV_WIDTH end
+			if PositionY < 0 then destY = ENV_HEIGHT end
+			
+			Move.to{x=destX,y=destY,speed=SPEED}
 			
 		elseif withinRangeOfPrey == true then
+			
+			--Check if the prey is within reach
+			if PositionX == t[1].posX + 1 or  PositionX == t[1].posX or PositionX == t[1].posX - 1 then
+				if PositionY == t[1].posY or PositionY == t[1].posY + 1 or PositionY == t[1].posY - 1 then
+					Event.emit{targetID=t[1].id, speed=343, description="Eaten"}
+				end
+			end
 			-- move towards prey
-			 Move.to{x=t[1].posX,y=t[1].posY,speed=10}
+			Move.to{x=t[1].posX,y=t[1].posY,speed=SPEED}
+			withinRangeOfPrey = false
+			
 		end
 		Collision.updatePosition(PositionX, PositionY)
 	end
+
+	
+	
 end
 
 function cleanUp()

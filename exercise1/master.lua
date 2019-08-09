@@ -8,12 +8,15 @@ function initializeAgent()
 	PositionX = Stat.randomInteger(0,ENV_WIDTH*2)
 
 	MAX_PREDATOR = 1
-	Shared.storeNumber(0, MAX_PREDATOR, true)
+	MAX_PREY = 5
 	Agent.changeColor{b=255}
 	for i=0, (MAX_PREDATOR - 1) do
 		Agent.addAgent("predator.lua")
 	end
 	
-	Agent.addAgent("prey.lua")
+	for i=0, (MAX_PREY - 1) do
+		Agent.addAgent("prey.lua")
+	end
+
 	
 end
