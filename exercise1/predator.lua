@@ -65,9 +65,12 @@ function initializeAgent()
 	PositionY = Stat.randomInteger(0,ENV_HEIGHT)
 	PositionX = Stat.randomInteger(0,ENV_WIDTH)
 	description = "predator"
+	GridMove = true
+	Moving = false
 	--Change Color
 	Agent.changeColor{r=255, g=0, b=0}
-
+	withinRangeOfPrey = false
+	counter = 0
 	l_debug("POS :" .. PositionY .. " , " .. PositionX)
 end
 
@@ -81,57 +84,51 @@ function takeStep()
 
 	--movement
 	--RAND XY POS
-	withinRangeOfPrey = false
-
-	table = Collision.radialCollisionScan(50)
-	if(table ~= nil) then
-	say("table not nil")
-		for i=0, table.n do
-			if(table[i].ID > MAX_PREDATOR + 1) then -- +1 Because of the master agent
-				withinRangeOfPrey = true
-			end
-		end
-	end	
-
-	if withinRangeOfPrey == false then	
-
-		randomInt = Stat.randomInteger(0,2)
-		--say("Agent" .. ID .. ": X-Pos: " .. randomInt)
-		if  randomInt == 1 then
-			PositionX = PositionX - (STEP_RESOLUTION * SPEED)
-		elseif randomInt == 2 then
-			PositionX = PositionX + (STEP_RESOLUTION * SPEED)
-		end
-
-		randomInt = Stat.randomInteger(0,2)
-		--say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
-		if  randomInt == 1 then
-			PositionY = PositionY - (STEP_RESOLUTION * SPEED)
-		elseif randomInt == 2 then
-			PositionY = PositionY + (STEP_RESOLUTION * SPEED)
-		end
+	if Moving == false then
+		t = Collision.radialCollisionScan(20)
 		
-		if PositionX > ENV_WIDTH then 
-			PositionX = 0 
-		end
-		if PositionY > ENV_HEIGHT then
-			PositionY = 0	
-		end
+		if(t ~= nil) then
+			withinRangeOfPrey = true
+		end	
 
-		if PositionX < 0 then 
-			PositionX = ENV_WIDTH 
-		end
-		if PositionY < 0 then
-			PositionY = ENV_HEIGHT
-		end
+		if withinRangeOfPrey == false then
+			local destX = 0
+			local destY = 0
+			randomInt = Stat.randomInteger(1,2)
+			if  randomInt == 1 then
+				destX = PositionX - 1
+			elseif randomInt == 2 then
+				destX = PositionX + 1
+			end
 
-		--Event.emit{speed=343,description="EAT",table={msg="I am agent "..ID}}
-	elseif withinRangeOfPrey == true then
-		-- move towards prey
+			randomInt = Stat.randomInteger(1,2)
+			if  randomInt == 1 then
+				destY = PositionY - 1
+			elseif randomInt == 2 then
+				destY = PositionY + 1
+			end
+			
+			if PositionX > ENV_WIDTH then 
+				destX = 0 
+			end
+			if PositionY > ENV_HEIGHT then
+				destY = 0	
+			end
+
+			if PositionX < 0 then 
+				destX = ENV_WIDTH 
+			end
+			if PositionY < 0 then
+				destY = ENV_HEIGHT
+			end
+			Move.to{x=destX,y=destY,speed=10}
+			
+		elseif withinRangeOfPrey == true then
+			-- move towards prey
+			 Move.to{x=t[1].posX,y=t[1].posY,speed=10}
+		end
+		Collision.updatePosition(PositionX, PositionY)
 	end
-	
-	Collision.updatePosition(PositionX, PositionY)
-
 end
 
 function cleanUp()

@@ -57,9 +57,13 @@ function initializeAgent()
 
 	l_debug("Agent #: " .. ID .. " has been initialized") 
 
-	PositionY = ENV_HEIGHT/2
-	PositionX = ENV_WIDTH/2
+	Moving = false
+	GridMove = true
 
+	if Moving==false then 	
+		Move.to{x=Stat.randomInteger(0,ENV_WIDTH),y=Stat.randomInteger(0,ENV_HEIGHT)}
+	end	
+	Moving = false
 	l_debug(ENV_HEIGHT)
 end
 
@@ -73,29 +77,13 @@ function takeStep()
 
 	--movement
 	--RAND XY POS
-	
-	randomInt = Stat.randomInteger(0,2)
-	--say("Agent" .. ID .. ": X-Pos: " .. randomInt)
-	if  randomInt == 1 then
-		PositionX = PositionX - 1
-	elseif randomInt == 2 then
-		PositionX = PositionX + 1
-	end
+	local destX = PositionX
+	local destY = PositionY
 
-	randomInt = Stat.randomInteger(0,2)
 	--say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
-	if  randomInt == 1 then
-		PositionY = PositionY - 1
-	elseif randomInt == 2 then
-		PositionY = PositionY + 1
-	end
-	
-	if PositionX > ENV_WIDTH then 
-		PositionX = 0 
-	end
-	if PositionY > ENV_HEIGHT then
-		PositionY = 0	
-	end
+	if Moving == false then 	
+		Move.toRandom(1) 
+	end	
 
 	Collision.updatePosition(PositionX, PositionY)
 
