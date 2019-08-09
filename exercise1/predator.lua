@@ -27,7 +27,7 @@ Collision = require "ranalib_collision"
 Shared = require "ranalib_shared"
 
 --Edit these from the master agent
-MAX_PREDATOR = Shared.getNumber(1)
+MAX_PREDATOR = Shared.getNumber(0)
 SPEED = Shared.getNumber(2)
 
 -- Init of the lua frog, function called upon initilization of the LUA auton.
@@ -61,8 +61,9 @@ function takeStep()
 		t = Collision.radialCollisionScan(20)
 		tableID = 0
 		if(t ~= nil) then
-			--If the id is not a predator 
-			withinRangeOfPrey = true
+			if t[1].id > MAX_PREDATOR then 
+				withinRangeOfPrey = true
+			end
 		end	
 
 		if withinRangeOfPrey == false then
@@ -101,7 +102,7 @@ function takeStep()
 			--Check if the prey is within reach
 			if PositionX == t[1].posX + 1 or  PositionX == t[1].posX or PositionX == t[1].posX - 1 then
 				if PositionY == t[1].posY or PositionY == t[1].posY + 1 or PositionY == t[1].posY - 1 then
-					Event.emit{targetID=t[1].id, speed=343, description="Eaten"}
+					Event.emit{targetID=t[1].id, speed=1000, description="Eaten"}
 				end
 			end
 			-- move towards prey

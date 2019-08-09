@@ -27,6 +27,7 @@ Collision = require "ranalib_collision"
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 
+MAX_PREY = Shared.getNumber(1)
 SPEED = Shared.getNumber(3)
 
 -- Init of the lua frog, function called upon initilization of the LUA auton.
