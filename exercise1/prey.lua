@@ -45,6 +45,7 @@
 Event = require "ranalib_event"
 Stat = require "ranalib_statistic"
 Move = require "ranalib_movement"
+Collision = require "ranalib_collision"
 
 above_count = 1
 below_count = 1
@@ -74,7 +75,7 @@ function takeStep()
 	--RAND XY POS
 	
 	randomInt = Stat.randomInteger(0,2)
-	say("Agent" .. ID .. ": X-Pos: " .. randomInt)
+	--say("Agent" .. ID .. ": X-Pos: " .. randomInt)
 	if  randomInt == 1 then
 		PositionX = PositionX - 1
 	elseif randomInt == 2 then
@@ -82,7 +83,7 @@ function takeStep()
 	end
 
 	randomInt = Stat.randomInteger(0,2)
-	say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
+	--say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
 	if  randomInt == 1 then
 		PositionY = PositionY - 1
 	elseif randomInt == 2 then
@@ -95,6 +96,8 @@ function takeStep()
 	if PositionY > ENV_HEIGHT then
 		PositionY = 0	
 	end
+
+	Collision.updatePosition(PositionX, PositionY)
 
 	--Event.emit{speed=343,description="EAT",table={msg="I am agent "..ID}}
 

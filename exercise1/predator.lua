@@ -45,11 +45,17 @@
 Event = require "ranalib_event"
 Stat = require "ranalib_statistic"
 Move = require "ranalib_movement"
+Agent = require "ranalib_agent"
+Collision = require "ranalib_collision"
+Shared = require "ranalib_shared"
 
 above_count = 1
 below_count = 1
 speed = 10
 Displacement = 1
+STEP_RESOLUTION = 1
+SPEED = 2
+MAX_PREDATOR = Shared.getNumber(0)
 
 -- Init of the lua frog, function called upon initilization of the LUA auton.
 function initializeAgent()
@@ -58,7 +64,7 @@ function initializeAgent()
 
 	PositionY = Stat.randomInteger(0,ENV_HEIGHT)
 	PositionX = Stat.randomInteger(0,ENV_WIDTH)
-	
+	description = "predator"
 	--Change Color
 	Agent.changeColor{r=255, g=0, b=0}
 
@@ -75,38 +81,56 @@ function takeStep()
 
 	--movement
 	--RAND XY POS
+	withinRangeOfPrey = false
+
+	table = Collision.radialCollisionScan(50)
+	if(table ~= nil) then
+	say("table not nil")
+		for i=0, table.n do
+			if(table[i].ID > MAX_PREDATOR + 1) then -- +1 Because of the master agent
+				withinRangeOfPrey = true
+			end
+		end
+	end	
+
+	if withinRangeOfPrey == false then	
+
+		randomInt = Stat.randomInteger(0,2)
+		--say("Agent" .. ID .. ": X-Pos: " .. randomInt)
+		if  randomInt == 1 then
+			PositionX = PositionX - (STEP_RESOLUTION * SPEED)
+		elseif randomInt == 2 then
+			PositionX = PositionX + (STEP_RESOLUTION * SPEED)
+		end
+
+		randomInt = Stat.randomInteger(0,2)
+		--say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
+		if  randomInt == 1 then
+			PositionY = PositionY - (STEP_RESOLUTION * SPEED)
+		elseif randomInt == 2 then
+			PositionY = PositionY + (STEP_RESOLUTION * SPEED)
+		end
+		
+		if PositionX > ENV_WIDTH then 
+			PositionX = 0 
+		end
+		if PositionY > ENV_HEIGHT then
+			PositionY = 0	
+		end
+
+		if PositionX < 0 then 
+			PositionX = ENV_WIDTH 
+		end
+		if PositionY < 0 then
+			PositionY = ENV_HEIGHT
+		end
+
+		--Event.emit{speed=343,description="EAT",table={msg="I am agent "..ID}}
+	elseif withinRangeOfPrey == true then
+		-- move towards prey
+	end
 	
-	randomInt = Stat.randomInteger(0,2)
-	say("Agent" .. ID .. ": X-Pos: " .. randomInt)
-	if  randomInt == 1 then
-		PositionX = PositionX - 1 * speed
-	elseif randomInt == 2 then
-		PositionX = PositionX + 1 * speed
-	end
-
-	randomInt = Stat.randomInteger(0,2)
-	say("Agent" .. ID .. ": Y-Pos: " .. randomInt)
-	if  randomInt == 1 then
-		PositionY = PositionY - 1 * speed
-	elseif randomInt == 2 then
-		PositionY = PositionY + 1 * speed
-	end
-	
-	if PositionX > ENV_WIDTH then 
-		PositionX = 0 
-	end
-	if PositionY > ENV_HEIGHT then
-		PositionY = 0	
-	end
-
-	if PositionX < 0 then 
-		PositionX = ENV_WIDTH 
-	end
-	if PositionY < 0 then
-		PositionY = ENV_HEIGHT
-	end
-
-	--Event.emit{speed=343,description="EAT",table={msg="I am agent "..ID}}
+	Collision.updatePosition(PositionX, PositionY)
 
 end
 
