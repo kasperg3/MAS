@@ -112,6 +112,9 @@ function moveTorus(x,y)
 	local directionX = destX-PositionX
 	local directionY = destY-PositionY
 	
+
+	Map.modifyColor(DestinationX,DestinationY,{0,0,0})
+
 	-- Changing direction to go through the edge of the map if path is shorter
 	if math.abs(directionX) > G/2 	then directionX = -directionX end
 	if math.abs(directionY) > G/2 	then directionY = -directionY end
@@ -222,7 +225,7 @@ function moveTorus(x,y)
 	DestinationX = destX
 	DestinationY = destY
 	
-
+	Map.modifyColor(PositionX,PositionY,{255,0,0})
 end
 
 
@@ -296,4 +299,6 @@ end
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")
+	Map.modifyColor(PositionX,PositionY,{0,0,0})	
+
 end
