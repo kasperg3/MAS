@@ -30,7 +30,6 @@ function initializeAgent()
 
 	gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 	gotoY = Stat.randomInteger(0, ENV_WIDTH)
-	counter = 0
 	sleepCounter = 0
 
 end
@@ -254,7 +253,6 @@ end
 
 function takeStep()
 	
-	counter = counter + 1
 	--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
 	dim = 100
 	res = squareSpiralTorusScanColor(dim,{255,255,255})
@@ -262,10 +260,9 @@ function takeStep()
 			withinRangeOfPrey = true
 	end
 	if withinRangeOfPrey == false then
-		if counter % 100 == 0 then
+		if reachedDestination(PositionX, PositionY, gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
-			counter = Stat.randomInteger(0, 100)
 		end
 		if Moving == false then
 			Moving = true
@@ -282,6 +279,19 @@ function takeStep()
 		moveTorus(res[1]["posX"],res[1]["posY"])
 	end			
 	withinRangeOfPrey = false
+end
+
+function reachedDestination(PositionX, PositionY, gotoX, gotoY)
+	result = false
+	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
+		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
+		result = true
+	end
+	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
+		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
+		result = true
+	end
+	return result
 end
 
 function cleanUp()
