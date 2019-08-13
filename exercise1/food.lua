@@ -8,6 +8,7 @@
 Stat = require "ranalib_statistic" 
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
+Map = require "ranalib_map"
 
 function initializeAgent()
 	-- Visible is the collision grid
@@ -15,6 +16,7 @@ function initializeAgent()
 	Agent.changeColor{g=255}
 	MAX_FOOD = Shared.getNumber(4)
 	foodSource = Stat.randomInteger(0, MAX_FOOD)
+	Map.modifyColor(PositionX,PositionY,{0,255,0})
 end
 
 
