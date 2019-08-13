@@ -275,7 +275,7 @@ function takeStep()
 		if math.abs(PositionX - res[1]["posX"]) < 2 and math.abs(PositionY - res[1]["posY"]) < 2 then
 			Event.emit{sourceX = res[1]["posX"], sourceY = res[1]["posY"], speed=1000, description="Eaten"}
 		else
-			distance(res[1]["posX"], res[1]["posY"])
+			--distance(res[1]["posX"], res[1]["posY"])
 			--Event.emit{table=dist, speed = 1000, description="Hunting"}
 		end
 	end

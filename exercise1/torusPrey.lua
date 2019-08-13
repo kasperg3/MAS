@@ -272,16 +272,15 @@ function takeStep()
 		--If predator is withing range, move opposite direction
 		if res then
 			if Moving == false then
-				local dest = getDestOppositeFromAgent(res)
+				local dest = getDestinationOppositeFromAgent(res)
 				gotoX = dest["X"]
 				gotoY = dest["Y"]
 				moveTorus(dest["X"],dest["Y"])
 			end
 		elseif food then
 			if Moving == false then
-				local dest = getDestOppositeFromAgent(food)
-				gotoX = food[1]["posX"] - dest["X"]
-				gotoY = food[1]["posY"] - dest["Y"]
+				gotoX =  food[1]["posX"]
+				gotoY =   food[1]["posY"]
 				moveTorus(gotoX,gotoX)
 			end
 		elseif reachedDestination(gotoX, gotoY) == true then
@@ -311,7 +310,7 @@ function reachedDestination(gotoX, gotoY)
 	return result
 end
 
-function getDestOppositeFromAgent(res)
+function getDestinationOppositeFromAgent(res)
 	local destX = res[1]["posX"]
 	local destY = res[1]["posY"]
 	local directionX = PositionX-destX

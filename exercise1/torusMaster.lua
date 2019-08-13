@@ -7,11 +7,11 @@ function initializeAgent()
 	PositionY = Stat.randomInteger(0,ENV_HEIGHT*2)
 	PositionX = Stat.randomInteger(0,ENV_WIDTH*2)
 
-	MAX_PREDATOR = 1
-	MAX_PREY = 50
-	SPEED_PREDATOR = 2
+	MAX_PREDATOR = 0
+	MAX_PREY = 20
+	SPEED_PREDATOR = 1
 	SPEED_PREY = 1
-	STARTING_FOOD = 3
+	STARTING_FOOD = 1
 
 	Shared.storeNumber(0, MAX_PREDATOR, true)
 	Shared.storeNumber(1, MAX_PREY, true)
