@@ -272,8 +272,7 @@ function takeStep()
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
 			counter = Stat.randomInteger(0, 100)
 		end
-		dim = 100
-		if math.abs(PositionX - gotoX) > 2 or math.abs(PositionY - gotoY) > 2 then
+		if math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
 			--say ("Moving")
 			if Moving == false then	
 				moveTorus(gotoX, gotoY)
@@ -284,12 +283,8 @@ function takeStep()
 	sleepCounter = sleepCounter + 1
 end
 
-function sleep(n)
-	time = clock()
-	while clock() - time <= n do end 
-end
-
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")
+	Map.modifyColor(PositionX,PositionY,{0,0,0})	
 end

@@ -9,8 +9,8 @@ function initializeAgent()
 
 	MAX_PREDATOR = 2
 	MAX_PREY = 10
-	SPEED_PREDATOR = 10
-	SPEED_PREY = 10000000000000000000000000000000
+	SPEED_PREDATOR = 50
+	SPEED_PREY = 1
 
 	Shared.storeNumber(0, MAX_PREDATOR, true)
 	Shared.storeNumber(1, MAX_PREY, true)

@@ -23,8 +23,6 @@ function initializeAgent()
 	-- Visible is the collision grid
 
 	GridMovement = true	-- Visible is the collision grid
-
-	GridMovement = true
 	say("Agent #: " .. ID .. " has been initialized")
 
 	--Map.modifyColor(10,10,{255,255,255})
@@ -256,49 +254,34 @@ end
 
 function takeStep()
 	
-	if sleepCounter % Shared.getNumber(2) == 0 then
-		counter = counter + 1
-		--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
-		dim = 100
-		res = squareSpiralTorusScanColor(dim,{255,255,255})
-		if res then
-			--say("Collisions found: "..#res)
-			for i = 1,#res do
-				--say("x: "..res[i]["posX"].." y: "..res[i]["posY"])
-				withinRangeOfPrey = true
-			end
-		end
-		if withinRangeOfPrey == false then
-			if counter % 100 == 0 then
-				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-				gotoY = Stat.randomInteger(0, ENV_WIDTH)
-				counter = Stat.randomInteger(0, 100)
-			end
-			if Moving == false then
-				moveTorus(gotoX, gotoY)
-				Moving = true
-			end
-		elseif withinRangeOfPrey == true then
-			--Check if the prey is within reach
-			if PositionX == res[1]["posX"] + 1 or  PositionX == res[1]["posX"] or PositionX == res[1]["posX"] - 1 then
-				if PositionY == res[1]["posY"] or PositionY == res[1]["posY"] + 1 or PositionY == res[1]["posY"] - 1 then
-					Event.emit{sourceX = res[1]["posX"], sourceY = res[1]["posY"], speed=1000, description="Eaten"}
-				end
-			end
-		end
-		-- move towards prey
-		if res then
-			--say("x: "..res[1]["posX"].." y: "..res[1]["posY"])
-			moveTorus(res[1]["posX"],res[1]["posY"])
-		end			
-		withinRangeOfPrey = false
+	counter = counter + 1
+	--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
+	dim = 100
+	res = squareSpiralTorusScanColor(dim,{255,255,255})
+	if res then
+			withinRangeOfPrey = true
 	end
-	sleepCounter = sleepCounter + 1
-end
-
-function sleep(n)
-	time = clock()
-	while clock() - time <= n do end 
+	if withinRangeOfPrey == false then
+		if counter % 100 == 0 then
+			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+			gotoY = Stat.randomInteger(0, ENV_WIDTH)
+			counter = Stat.randomInteger(0, 100)
+		end
+		if Moving == false then
+			Moving = true
+			moveTorus(gotoX, gotoY)
+		end
+	elseif withinRangeOfPrey == true then
+		if math.abs(PositionX - res[1]["posX"]) < 2 and math.abs(PositionY - res[1]["posY"]) < 2 then
+			Event.emit{sourceX = res[1]["posX"], sourceY = res[1]["posY"], speed=1000, description="Eaten"}
+		end
+	end
+	-- move towards prey
+	if res then
+		Moving = true
+		moveTorus(res[1]["posX"],res[1]["posY"])
+	end			
+	withinRangeOfPrey = false
 end
 
 function cleanUp()
