@@ -120,12 +120,12 @@ function moveTorus(x,y)
 	if math.abs(directionY) > G/2 	then directionY = -directionY end
 	
 	-- Determining destination point
-	if	directionX > 0 then destX = PositionX+1
-	elseif	directionX < 0 then destX = PositionX-1
+	if	directionX > 0.1 then destX = PositionX+1
+	elseif	directionX < -0.1 then destX = PositionX-1
 	else	destX = PositionX	end
 	
-	if	directionY > 0 then destY = PositionY+1
-	elseif	directionY < 0 then destY = PositionY-1
+	if	directionY > 0.1 then destY = PositionY+1
+	elseif	directionY < -0.1 then destY = PositionY-1
 	else	destY = PositionY	end
 	
 	-- Determining destination point if direction is through the edge of the map
@@ -280,8 +280,10 @@ function takeStep()
 		elseif food then
 			if Moving == false then
 				gotoX =  food[1]["posX"]
-				gotoY =   food[1]["posY"]
-				moveTorus(gotoX,gotoX)
+				gotoY = food[1]["posY"]
+				moveTorus(food[1]["posX"],food[1]["posY"])
+				Event.emit{sourceX = food[1][""], sourceY = food[1]["posY"], speed=1, description="EatFood"}
+
 			end
 		elseif reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)

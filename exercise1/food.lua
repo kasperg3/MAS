@@ -25,7 +25,7 @@ end
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	if eventDescription == "EatFood" then 
 			foodSource = foodSource - 1
-			if foodSource == 0 then
+			if foodSource < 0 then
 				Agent.removeAgent(ID)
 			end
 	end
@@ -33,7 +33,7 @@ end
 
 
 function takeStep()
-
+	Map.modifyColor(DestinationX,DestinationY,{0,255,0})
 end
 
 
