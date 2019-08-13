@@ -264,7 +264,6 @@ end
 
 
 function takeStep()
-	if sleepCounter % Shared.getNumber(2) == 0 then
 		counter = counter + 1
 		--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
 		if counter % 100 == 0 then
@@ -280,8 +279,7 @@ function takeStep()
 			end
 		end
 	end
-	sleepCounter = sleepCounter + 1
-end
+
 
 
 function cleanUp()
