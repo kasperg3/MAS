@@ -265,18 +265,33 @@ end
 
 function takeStep()
 	if sleepCounter % Shared.getNumber(2) == 0 then
+		dim = 50
 		counter = counter + 1
-		--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
-		if reachedDestination(gotoX, gotoY) == true then
+		res = squareSpiralTorusScanColor(dim,{255,0,0})
+		food = squareSpiralTorusScanColor(dim,{0,255,0})
+		--If predator is withing range, move opposite direction
+		if res then
+			if Moving == false then
+				local dest = getDestOppositeFromAgent(res)
+				gotoX = dest["X"]
+				gotoY = dest["Y"]
+				moveTorus(dest["X"],dest["Y"])
+			end
+		elseif food then
+			if Moving == false then
+				local dest = getDestOppositeFromAgent(food)
+				gotoX = food[1]["posX"] - dest["X"]
+				gotoY = food[1]["posY"] - dest["Y"]
+				moveTorus(gotoX,gotoX)
+			end
+		elseif reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
 			counter = Stat.randomInteger(0, 100)
-		end
-		if math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
-			--say ("Moving")
+		elseif math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
 			if Moving == false then	
+				Moving = true;	
 				moveTorus(gotoX, gotoY)
-				Moving = true;
 			end
 		end
 	end
@@ -296,6 +311,40 @@ function reachedDestination(gotoX, gotoY)
 	return result
 end
 
+function getDestOppositeFromAgent(res)
+	local destX = res[1]["posX"]
+	local destY = res[1]["posY"]
+	local directionX = PositionX-destX
+	local directionY = PositionY-destY
+
+	-- Changing direction to go through the edge of the map if path is shorter
+	if math.abs(directionX) > G/2 	then directionX = -directionX end
+	if math.abs(directionY) > G/2 	then directionY = -directionY end
+	
+	-- Determining destination point
+	if	directionX > 0 then destX = PositionX+1
+	elseif	directionX < 0 then destX = PositionX-1
+	else	destX = PositionX	end
+	
+	if	directionY > 0 then destY = PositionY+1
+	elseif	directionY < 0 then destY = PositionY-1
+	else	destY = PositionY	end
+	
+	-- Determining destination point if direction is through the edge of the map
+	if destX < 0 then 
+		destX = G-1
+	elseif destX >= G then
+		destX = 0
+	end
+	
+	if destY < 0 then
+		destY = G-1
+	elseif destY >= G then
+		destY = 0
+	end
+
+	return {X = destX, Y=destY}
+end
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")

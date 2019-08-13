@@ -1,7 +1,7 @@
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 Stat = require "ranalib_statistic"
-
+Map = require "ranalib_map"
 function initializeAgent()
 
 	PositionY = Stat.randomInteger(0,ENV_HEIGHT*2)
@@ -17,7 +17,6 @@ function initializeAgent()
 	Shared.storeNumber(1, MAX_PREY, true)
 	Shared.storeNumber(2, SPEED_PREDATOR, true)
 	Shared.storeNumber(3, SPEED_PREY, true)
-	Shared.storeNumber(4, STARTING_FOOD, true)
 
 	Agent.changeColor{b=255}
 	for i=0, (MAX_PREDATOR - 1) do
