@@ -112,6 +112,9 @@ function moveTorus(x,y)
 	local directionX = destX-PositionX
 	local directionY = destY-PositionY
 	
+
+	Map.modifyColor(DestinationX,DestinationY,{0,0,0})
+
 	-- Changing direction to go through the edge of the map if path is shorter
 	if math.abs(directionX) > G/2 	then directionX = -directionX end
 	if math.abs(directionY) > G/2 	then directionY = -directionY end
@@ -222,7 +225,7 @@ function moveTorus(x,y)
 	DestinationX = destX
 	DestinationY = destY
 	
-
+	Map.modifyColor(PositionX,PositionY,{255,0,0})
 end
 
 
@@ -271,9 +274,6 @@ function takeStep()
 	elseif withinRangeOfPrey == true then
 		if math.abs(PositionX - res[1]["posX"]) < 2 and math.abs(PositionY - res[1]["posY"]) < 2 then
 			Event.emit{sourceX = res[1]["posX"], sourceY = res[1]["posY"], speed=1000, description="Eaten"}
-		else
-			distance(res[1]["posX"], res[1]["posY"])
-			--Event.emit{table=dist, speed = 1000, description="Hunting"}
 		end
 	end
 	-- move towards prey
@@ -297,30 +297,8 @@ function reachedDestination(gotoX, gotoY)
 	return result
 end
 
-function distance(gotoX, gotoY)
-
-	local distanceX = math.abs(gotoX-PositionX)
-	local distanceY = math.abs(gotoY-PositionY)
-
-	if math.abs(distanceX) > ENV_WIDTH/2 	then --if go through wall X direction
-		distanceX = math.abs(distanceX - ENV_WIDTH)
-	end
-	if math.abs(distanceY) > ENV_HEIGHT/2 	then --if go through wall Y direction
-		distanceY = math.abs(distanceY - ENV_HEIGHT)
-	end
-	--dist = (PositionX - gotoY)*(PositionX - gotoY)+(PositionY - gotoX)*(PositionY - gotoX)
-	dist = distanceX * distanceX + distanceY * distanceY
-	
-	say("distX: "..distanceX.." distY: "..distanceY)
-	say("currX: "..PositionX.." currY: "..PositionY)
-	say("gotoX: "..gotoX.." gotoY: "..gotoY)
-	
-	dist = math.sqrt(dist)
-	say("total dist: "..dist)
-	say("")
-	return dist
-end
-
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")
+	Map.modifyColor(PositionX,PositionY,{0,0,0})	
+
 end

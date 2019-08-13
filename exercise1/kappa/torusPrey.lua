@@ -13,23 +13,22 @@ Stat = require "ranalib_statistic"
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 
-
  -- Grid size 
 local G = 200
 local doScan = true
-Speed = Shared.getNumber(2)
+Speed = Shared.getNumber(3)
 
 function initializeAgent()
 	-- Visible is the collision grid
 
 	GridMovement = true	-- Visible is the collision grid
-	say("Agent #: " .. ID .. " has been initialized")
 
-	--Map.modifyColor(10,10,{255,255,255})
-	Agent.changeColor{r=255, g=0, b=0}
+	GridMovement = true
+	say("Agent #: " .. ID .. " has been initialized")
 
 	gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 	gotoY = Stat.randomInteger(0, ENV_WIDTH)
+	counter = 0
 	sleepCounter = 0
 
 end
@@ -111,6 +110,10 @@ function moveTorus(x,y)
 	local destY = y
 	local directionX = destX-PositionX
 	local directionY = destY-PositionY
+
+	-- Update color position (PREY ONLY)
+	--say("Removing color: "..PositionX..", "..PositionY)
+	Map.modifyColor(PositionX,PositionY,{0,0,0})
 	
 	-- Changing direction to go through the edge of the map if path is shorter
 	if math.abs(directionX) > G/2 	then directionX = -directionX end
@@ -215,20 +218,29 @@ function moveTorus(x,y)
 		end
 		
 		-- Update position
-		Collision.updatePosition(destX,destY) 
+		Collision.updatePosition(destX,destY)
+		
 
 	end
 
 	DestinationX = destX
 	DestinationY = destY
 	
+	--say("Adding color: "..destX..", "..destY)
+	Map.modifyColor(DestinationX,DestinationY,{255,255,255})
 
 end
 
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-
+	
+	if eventDescription == "Eaten" then 
+		if math.abs(PositionX - sourceX) < 2 and math.abs(PositionY - sourceY) < 2 then
+			Map.modifyColor(PositionX,PositionY,{0,0,0})
+			Agent.removeAgent(ID)
+		end
+	end
 	
 end
 
@@ -252,36 +264,64 @@ end
 
 
 function takeStep()
-	
-	--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
-	dim = 100
-	res = squareSpiralTorusScanColor(dim,{255,255,255})
-	if res then
-			withinRangeOfPrey = true
-	end
-	if withinRangeOfPrey == false then
+	if sleepCounter % Shared.getNumber(2) == 0 then
+		dim = 75
+		res = squareSpiralTorusScanColor(dim,{255,0,0})
+
+		if res then
+			local destX = res[1]["posX"]
+			local destY = res[1]["posY"]
+			local directionX = PositionX-destX
+			local directionY = PositionY-destY
+
+			-- Changing direction to go through the edge of the map if path is shorter
+			if math.abs(directionX) > G/2 	then directionX = -directionX end
+			if math.abs(directionY) > G/2 	then directionY = -directionY end
+			
+			-- Determining destination point
+			if	directionX > 0 then destX = PositionX+1
+			elseif	directionX < 0 then destX = PositionX-1
+			else	destX = PositionX	end
+			
+			if	directionY > 0 then destY = PositionY+1
+			elseif	directionY < 0 then destY = PositionY-1
+			else	destY = PositionY	end
+			
+			-- Determining destination point if direction is through the edge of the map
+			if destX < 0 then 
+				destX = G-1
+			elseif destX >= G then
+				destX = 0
+			end
+			
+			if destY < 0 then
+				destY = G-1
+			elseif destY >= G then
+				destY = 0
+			end
+			
+			if Moving == false then
+				moveTorus(destX,destY)
+			end
+
+		end
+
+		counter = counter + 1
+		--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
 		if reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
+			counter = Stat.randomInteger(0, 100)
 		end
-		if Moving == false then
-			Moving = true
-			moveTorus(gotoX, gotoY)
-		end
-	elseif withinRangeOfPrey == true then
-		if math.abs(PositionX - res[1]["posX"]) < 2 and math.abs(PositionY - res[1]["posY"]) < 2 then
-			Event.emit{sourceX = res[1]["posX"], sourceY = res[1]["posY"], speed=1000, description="Eaten"}
-		else
-			distance(res[1]["posX"], res[1]["posY"])
-			--Event.emit{table=dist, speed = 1000, description="Hunting"}
+		if math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
+			--say ("Moving")
+			if Moving == false then	
+				moveTorus(gotoX, gotoY)
+				Moving = true;
+			end
 		end
 	end
-	-- move towards prey
-	if res then
-		Moving = true
-		moveTorus(res[1]["posX"],res[1]["posY"])
-	end			
-	withinRangeOfPrey = false
+	sleepCounter = sleepCounter + 1
 end
 
 function reachedDestination(gotoX, gotoY)
@@ -297,30 +337,8 @@ function reachedDestination(gotoX, gotoY)
 	return result
 end
 
-function distance(gotoX, gotoY)
-
-	local distanceX = math.abs(gotoX-PositionX)
-	local distanceY = math.abs(gotoY-PositionY)
-
-	if math.abs(distanceX) > ENV_WIDTH/2 	then --if go through wall X direction
-		distanceX = math.abs(distanceX - ENV_WIDTH)
-	end
-	if math.abs(distanceY) > ENV_HEIGHT/2 	then --if go through wall Y direction
-		distanceY = math.abs(distanceY - ENV_HEIGHT)
-	end
-	--dist = (PositionX - gotoY)*(PositionX - gotoY)+(PositionY - gotoX)*(PositionY - gotoX)
-	dist = distanceX * distanceX + distanceY * distanceY
-	
-	say("distX: "..distanceX.." distY: "..distanceY)
-	say("currX: "..PositionX.." currY: "..PositionY)
-	say("gotoX: "..gotoX.." gotoY: "..gotoY)
-	
-	dist = math.sqrt(dist)
-	say("total dist: "..dist)
-	say("")
-	return dist
-end
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")
+	Map.modifyColor(PositionX,PositionY,{0,0,0})	
 end
