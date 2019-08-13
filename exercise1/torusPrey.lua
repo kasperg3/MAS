@@ -267,7 +267,7 @@ function takeStep()
 	if sleepCounter % Shared.getNumber(2) == 0 then
 		counter = counter + 1
 		--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
-		if counter % 100 == 0 then
+		if reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
 			counter = Stat.randomInteger(0, 100)
@@ -281,6 +281,19 @@ function takeStep()
 		end
 	end
 	sleepCounter = sleepCounter + 1
+end
+
+function reachedDestination(gotoX, gotoY)
+	result = false
+	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
+		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
+		result = true
+	end
+	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
+		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
+		result = true
+	end
+	return result
 end
 
 

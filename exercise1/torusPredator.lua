@@ -260,7 +260,7 @@ function takeStep()
 			withinRangeOfPrey = true
 	end
 	if withinRangeOfPrey == false then
-		if reachedDestination(PositionX, PositionY, gotoX, gotoY) == true then
+		if reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
 		end
@@ -281,7 +281,7 @@ function takeStep()
 	withinRangeOfPrey = false
 end
 
-function reachedDestination(PositionX, PositionY, gotoX, gotoY)
+function reachedDestination(gotoX, gotoY)
 	result = false
 	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
 		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
