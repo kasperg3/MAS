@@ -1,0 +1,29 @@
+
+////BRAINSTORM
+
+explorers:
+	- communicates with other explorers for better coverage
+	- Request available transporter withing transmission range 
+	- Make transporters/explorers use the closest base
+	- If an available transporter is within range transmit the X most recent seen ores
+	- X amount seen ore before informing base, timeout: dont explore for too long time with valuable infomation
+	- shrink/expand perception field if another explorer is nearby
+	- Shrink/Expand when closer to the base
+	- Don't move all the way to the base, use coms
+	- Breadcrumbs when seeing a ore, when already have coordinate stored 
+	- Store covered coordinates
+	- The less energy a robot has less desire to move away from the closest base
+	
+Transporter:
+	- Occationally perception
+	- Make transporters explore when no requests are available
+	- Make transporters follow when no requests are available
+	- Make transporters Roam when no requests are available
+	- Transmit in local neighbourhood if depleting a ore or not 
+	- communicates with other explorers for better coverage
+
+Base:
+	- Coorperative?
+
+Q:
+	- Storage of coordinates, is the base coordinate counted as memory usage (S < (X + Y + N))
