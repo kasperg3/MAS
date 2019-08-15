@@ -10,7 +10,7 @@ Shared = require "ranalib_shared"
 Torus = require "torus"
 
  -- Grid size 
-local G = 200
+local G = ENV_WIDTH
 local doScan = true
 Speed = Shared.getNumber(3)
 
