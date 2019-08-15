@@ -33,5 +33,5 @@ function initializeAgent()
 		Agent.addAgent("food.lua")
 	end
 
-	
+	Agent.removeAgent(ID)
 end
