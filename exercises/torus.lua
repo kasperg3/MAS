@@ -1,6 +1,8 @@
 local torus = {}
 Map = require "ranalib_map"
 
+
+
 function torus.squareSpiralTorusScanColor(dimension, color, G)
 	--G is the dimension of the map(Needs to be a square)
 	local x = 0
@@ -104,12 +106,12 @@ function torus.move(x,y, G, color)
 	if math.abs(directionY) > G/2 	then directionY = -directionY end
 	
 	-- Determining destination point
-	if	directionX > 0 then destX = PositionX+1
-	elseif	directionX < 0 then destX = PositionX-1
+	if	directionX > 0.1 then destX = PositionX+1
+	elseif	directionX < -0.1 then destX = PositionX-1
 	else	destX = PositionX	end
 	
-	if	directionY > 0 then destY = PositionY+1
-	elseif	directionY < 0 then destY = PositionY-1
+	if	directionY > 0.1 then destY = PositionY+1
+	elseif	directionY < -0.1 then destY = PositionY-1
 	else	destY = PositionY	end
 	
 	-- Determining destination point if direction is through the edge of the map
@@ -208,11 +210,30 @@ function torus.move(x,y, G, color)
 
 	DestinationX = destX
 	DestinationY = destY
+
+
 	if color then
 		Map.modifyColor(PositionX,PositionY,color)
 	end
 end
 
 
+function torus.distance(gotoX, gotoY)
+
+	local distanceX = math.abs(gotoX-PositionX)
+	local distanceY = math.abs(gotoY-PositionY)
+
+	if math.abs(distanceX) > ENV_WIDTH/2 	then --if go through wall X direction
+		distanceX = math.abs(distanceX - ENV_WIDTH)
+	end
+	if math.abs(distanceY) > ENV_HEIGHT/2 	then --if go through wall Y direction
+		distanceY = math.abs(distanceY - ENV_HEIGHT)
+	end
+	--dist = (PositionX - gotoY)*(PositionX - gotoY)+(PositionY - gotoX)*(PositionY - gotoX)
+	dist = distanceX * distanceX + distanceY * distanceY
+	
+	dist = math.sqrt(dist)
+	return dist
+end
 
 return torus

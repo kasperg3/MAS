@@ -98,29 +98,6 @@ function reachedDestination(gotoX, gotoY)
 	return result
 end
 
-function distance(gotoX, gotoY)
-
-	local distanceX = math.abs(gotoX-PositionX)
-	local distanceY = math.abs(gotoY-PositionY)
-
-	if math.abs(distanceX) > ENV_WIDTH/2 	then --if go through wall X direction
-		distanceX = math.abs(distanceX - ENV_WIDTH)
-	end
-	if math.abs(distanceY) > ENV_HEIGHT/2 	then --if go through wall Y direction
-		distanceY = math.abs(distanceY - ENV_HEIGHT)
-	end
-	--dist = (PositionX - gotoY)*(PositionX - gotoY)+(PositionY - gotoX)*(PositionY - gotoX)
-	dist = distanceX * distanceX + distanceY * distanceY
-	
-	say("distX: "..distanceX.." distY: "..distanceY)
-	say("currX: "..PositionX.." currY: "..PositionY)
-	say("gotoX: "..gotoX.." gotoY: "..gotoY)
-	
-	dist = math.sqrt(dist)
-	say("total dist: "..dist)
-	say("")
-	return dist
-end
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")

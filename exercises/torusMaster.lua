@@ -31,7 +31,7 @@ function initializeAgent()
 	PositionX = Stat.randomInteger(0,ENV_WIDTH*2)
 
 	MAX_PREDATOR = 1
-	MAX_PREY = 20
+	MAX_PREY = 10
 	SPEED_PREDATOR = 1	--This controls how many steps the predator should skip.
 	SPEED_PREY = 2		--This controls how many steps the prey should skip, the lager value the slower agent
 	STARTING_FOOD = 10

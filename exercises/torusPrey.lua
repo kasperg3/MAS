@@ -46,8 +46,7 @@ function initializeAgent()
 
 	gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 	gotoY = Stat.randomInteger(0, ENV_WIDTH)
-	counter = 0
-	sleepCounter = 0
+	Agent.changeColor{r=255,g=255}	
 
 end
 

@@ -1,8 +1,4 @@
---
---
--- Torus implementation by Rikke Tranborg and Maria Dam 
---
---
+
 
 -- Import Rana lua modules.
 Stat = require "ranalib_statistic" 
@@ -16,7 +12,6 @@ function initializeAgent()
 	Agent.changeColor{g=255}
 	MAX_FOOD = Shared.getNumber(4)
 	foodSource = Stat.randomInteger(0, MAX_FOOD)
-	Map.modifyColor(PositionX,PositionY,{0,255,0})
 end
 
 
@@ -33,10 +28,13 @@ end
 
 
 function takeStep()
-	Map.modifyColor(DestinationX,DestinationY,{0,255,0})
+	if Map.checkColor(PositionX,PositionY) then
+		Map.modifyColor(PositionX,PositionY,{0,255,0})
+	end
 end
 
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")	
+	Map.modifyColor(PositionX,PositionY,{0,0,0})
 end
