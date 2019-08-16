@@ -28,7 +28,7 @@ end
 
 
 function takeStep()
-	if Map.checkColor(PositionX,PositionY) then
+	if Map.checkColor(PositionX,PositionY) ~= {0,255,0} then
 		Map.modifyColor(PositionX,PositionY,{0,255,0})
 	end
 end
