@@ -87,7 +87,7 @@ function takeStep()
 			say("EMITTING FOOD EATEN: " .. Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) )
 
 			if Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) <= 1 then 
-				Event.emit{sourceX = PositionX, sourceY = PositionY, speed=10, description="EatFood"}
+				Event.emit{sourceX = PositionX, sourceY = PositionY, speed=2, description="EatFood"}
 			end
 		end
 	elseif Torus.reachedDestination(gotoX, gotoY) == true then

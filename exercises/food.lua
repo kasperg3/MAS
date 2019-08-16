@@ -39,9 +39,9 @@ function initializeAgent()
 end
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	if eventDescription == "EatFood" then 
+	if eventDescription == "EatFood" and Torus.distance(PositionX, PositionY, sourceX, sourceY, ENV_WIDTH, ENV_HEIGHT) < 2 then 
 			foodSource = foodSource - 1
-			if foodSource < 0 and Torus.distance(PositionX, PositionY, sourceX, sourceY, ENV_WIDTH, ENV_HEIGHT) < 2 then
+			if foodSource < 0 then
 				Map.modifyColor(PositionX,PositionY,{0,0,0})
 				Agent.removeAgent(ID)
 			end
