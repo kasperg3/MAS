@@ -1,8 +1,24 @@
---
---
--- Torus implementation by Rikke Tranborg and Maria Dam 
---
---
+--The following global values are set via the simulation core:
+-- ------------------------------------
+-- IMMUTABLES.
+-- ------------------------------------
+-- ID -- id of the agent.
+-- STEP_RESOLUTION 	-- resolution of steps, in the simulation core.
+-- EVENT_RESOLUTION	-- resolution of event distribution.
+-- ENV_WIDTH -- Width of the environment in meters.
+-- ENV_HEIGHT -- Height of the environment in meters.
+-- ------------------------------------
+-- VARIABLES.
+-- ------------------------------------
+-- PositionX	 	-- Agents position in the X plane.
+-- PositionY	 	-- Agents position in the Y plane.
+-- DestinationX 	-- Agents destination in the X plane. 
+-- DestinationY 	-- Agents destination in the Y plane.
+-- StepMultiple 	-- Amount of steps to skip.
+-- Speed 		-- Movement speed of the agent in meters pr. second.
+-- Moving 		-- Denotes wether this agent is moving (default = false).
+-- GridMove 		-- Is collision detection active (default = false).
+-- ------------------------------------
 
 -- Import Rana lua modules.
 Event = require "ranalib_event"
@@ -17,9 +33,8 @@ Torus = require "torus"
 
  -- Grid size 
 local G = ENV_WIDTH
-local doScan = true
-Speed = Shared.getNumber(2)
-
+StepMultiple = Shared.getNumber(2)
+--StepMultiple = 4
 function initializeAgent()
 	-- Visible is the collision grid
 
@@ -31,7 +46,6 @@ function initializeAgent()
 
 	gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 	gotoY = Stat.randomInteger(0, ENV_WIDTH)
-	sleepCounter = 0
 
 end
 
@@ -43,9 +57,9 @@ end
 function takeStep()
 	
 	--say("gotoX: "..gotoX.." PositionX: "..PositionX.."gotoY: "..gotoY.." PositionY: "..PositionY)
-	dim = 100
+	local dim = 100
 	local color = {255,0,0}
-	res = Torus.squareSpiralTorusScanColor(dim,{255,255,255}, G)
+	local res = Torus.squareSpiralTorusScanColor(dim,{255,255,255}, G)
 	if res then
 			withinRangeOfPrey = true
 	end
@@ -61,9 +75,6 @@ function takeStep()
 	elseif withinRangeOfPrey == true then
 		if math.abs(PositionX - res[1]["posX"]) < 2 and math.abs(PositionY - res[1]["posY"]) < 2 then
 			Event.emit{sourceX = res[1]["posX"], sourceY = res[1]["posY"], speed=1000, description="Eaten"}
-		else
-			--distance(res[1]["posX"], res[1]["posY"])
-			--Event.emit{table=dist, speed = 1000, description="Hunting"}
 		end
 	end
 	-- move towards prey

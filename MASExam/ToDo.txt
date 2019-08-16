@@ -12,8 +12,8 @@ explorers:
 	- Don't move all the way to the base, use coms
 	- Breadcrumbs when seeing a ore, when already have coordinate stored 
 	- Store covered coordinates
-	- The less energy a robot has less desire to move away from the closest base
-	
+	- The less energy a robot has less desire to move away from the closest base 
+
 Transporter:
 	- Occationally perception
 	- Make transporters explore when no requests are available

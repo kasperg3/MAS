@@ -1,3 +1,25 @@
+--The following global values are set via the simulation core:
+-- ------------------------------------
+-- IMMUTABLES.
+-- ------------------------------------
+-- ID -- id of the agent.
+-- STEP_RESOLUTION 	-- resolution of steps, in the simulation core.
+-- EVENT_RESOLUTION	-- resolution of event distribution.
+-- ENV_WIDTH -- Width of the environment in meters.
+-- ENV_HEIGHT -- Height of the environment in meters.
+-- ------------------------------------
+-- VARIABLES.
+-- ------------------------------------
+-- PositionX	 	-- Agents position in the X plane.
+-- PositionY	 	-- Agents position in the Y plane.
+-- DestinationX 	-- Agents destination in the X plane. 
+-- DestinationY 	-- Agents destination in the Y plane.
+-- StepMultiple 	-- Amount of steps to skip.
+-- Speed 		-- Movement speed of the agent in meters pr. second.
+-- Moving 		-- Denotes wether this agent is moving (default = false).
+-- GridMove 		-- Is collision detection active (default = false).
+-- ------------------------------------
+
 -- Import Rana lua modules.
 Event = require "ranalib_event"
 Stat = require "ranalib_statistic"
@@ -11,8 +33,8 @@ Torus = require "torus"
 
  -- Grid size 
 local G = ENV_WIDTH
+StepMultiple = Shared.getNumber(3)
 local doScan = true
-Speed = Shared.getNumber(3)
 
 function initializeAgent()
 	-- Visible is the collision grid
@@ -46,39 +68,34 @@ end
 
 function takeStep()
 	local color = {255,255,255}
-	if sleepCounter % Shared.getNumber(2) == 0 then
-		dim = 50
-		counter = counter + 1
-		res = Torus.squareSpiralTorusScanColor(dim,{255,0,0},G)
-		food = Torus.squareSpiralTorusScanColor(dim,{0,255,0},G)
-		--If predator is withing range, move opposite direction
-		if res then
-			if Moving == false then
-				local dest = getDestinationOppositeFromAgent(res)
-				gotoX = dest["X"]
-				gotoY = dest["Y"]
-				Torus.move(dest["X"],dest["Y"], G, color)
-			end
-		elseif food then
-			if Moving == false then
-				gotoX =  food[1]["posX"]
-				gotoY = food[1]["posY"]
-				Torus.move(food[1]["posX"],food[1]["posY"], G, color)
-				Event.emit{sourceX = food[1][""], sourceY = food[1]["posY"], speed=1, description="EatFood"}
+	local dim = 50
+	local res = Torus.squareSpiralTorusScanColor(dim,{255,0,0},G)
+	local food = Torus.squareSpiralTorusScanColor(dim,{0,255,0},G)
+	--If predator is withing range, move opposite direction
+	if res then
+		if Moving == false then
+			local dest = getDestinationOppositeFromAgent(res)
+			gotoX = dest["X"]
+			gotoY = dest["Y"]
+			Torus.move(dest["X"],dest["Y"], G, color)
+		end
+	elseif food then
+		if Moving == false then
+			gotoX =  food[1]["posX"]
+			gotoY = food[1]["posY"]
+			Torus.move(food[1]["posX"],food[1]["posY"], G, color)
+			Event.emit{sourceX = food[1][""], sourceY = food[1]["posY"], speed=1, description="EatFood"}
 
-			end
-		elseif reachedDestination(gotoX, gotoY) == true then
-			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-			gotoY = Stat.randomInteger(0, ENV_WIDTH)
-			counter = Stat.randomInteger(0, 100)
-		elseif math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
-			if Moving == false then	
-				Moving = true;	
-				Torus.move(gotoX, gotoY, G, color)
-			end
+		end
+	elseif reachedDestination(gotoX, gotoY) == true then
+		gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+		gotoY = Stat.randomInteger(0, ENV_WIDTH)
+	elseif math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
+		if Moving == false then	
+			Moving = true;	
+			Torus.move(gotoX, gotoY, G, color)
 		end
 	end
-	sleepCounter = sleepCounter + 1
 end
 
 function reachedDestination(gotoX, gotoY)
