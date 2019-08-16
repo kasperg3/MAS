@@ -218,10 +218,10 @@ function torus.move(x,y, G, color)
 end
 
 
-function torus.distance(gotoX, gotoY)
+function torus.distance(gotoX, gotoY, positionX, positionY, ENV_WIDTH, ENV_HEIGHT)
 
-	local distanceX = math.abs(gotoX-PositionX)
-	local distanceY = math.abs(gotoY-PositionY)
+	local distanceX = math.abs(gotoX-positionX)
+	local distanceY = math.abs(gotoY-positionY)
 
 	if math.abs(distanceX) > ENV_WIDTH/2 	then --if go through wall X direction
 		distanceX = math.abs(distanceX - ENV_WIDTH)
@@ -235,5 +235,20 @@ function torus.distance(gotoX, gotoY)
 	dist = math.sqrt(dist)
 	return dist
 end
+
+
+function torus.reachedDestination(gotoX, gotoY)
+	result = false
+	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
+		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
+		result = true
+	end
+	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
+		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
+		result = true
+	end
+	return result
+end
+
 
 return torus

@@ -32,6 +32,7 @@ Shared = require "ranalib_shared"
 Torus = require "torus"
 
  -- Grid size 
+Speed = 1
 local G = ENV_WIDTH
 StepMultiple = Shared.getNumber(2)
 --StepMultiple = 4
@@ -64,7 +65,7 @@ function takeStep()
 			withinRangeOfPrey = true
 	end
 	if withinRangeOfPrey == false then
-		if reachedDestination(gotoX, gotoY) == true then
+		if Torus.reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
 		end
@@ -84,20 +85,6 @@ function takeStep()
 	end			
 	withinRangeOfPrey = false
 end
-
-function reachedDestination(gotoX, gotoY)
-	result = false
-	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
-		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
-		result = true
-	end
-	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
-		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
-		result = true
-	end
-	return result
-end
-
 
 function cleanUp()
 	say("Agent #: " .. ID .. " is done\n")

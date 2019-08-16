@@ -32,6 +32,7 @@ Shared = require "ranalib_shared"
 Torus = require "torus"
 
  -- Grid size 
+Speed = 1
 local G = ENV_WIDTH
 StepMultiple = Shared.getNumber(3)
 local doScan = true
@@ -83,10 +84,13 @@ function takeStep()
 			gotoX =  food[1]["posX"]
 			gotoY = food[1]["posY"]
 			Torus.move(food[1]["posX"],food[1]["posY"], G, color)
-			Event.emit{sourceX = food[1][""], sourceY = food[1]["posY"], speed=1, description="EatFood"}
+			say("EMITTING FOOD EATEN: " .. Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) )
 
+			if Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) <= 1 then 
+				Event.emit{sourceX = PositionX, sourceY = PositionY, speed=10, description="EatFood"}
+			end
 		end
-	elseif reachedDestination(gotoX, gotoY) == true then
+	elseif Torus.reachedDestination(gotoX, gotoY) == true then
 		gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 		gotoY = Stat.randomInteger(0, ENV_WIDTH)
 	elseif math.abs(PositionX - gotoX) > 1 or math.abs(PositionY - gotoY) > 1 then
@@ -95,19 +99,6 @@ function takeStep()
 			Torus.move(gotoX, gotoY, G, color)
 		end
 	end
-end
-
-function reachedDestination(gotoX, gotoY)
-	result = false
-	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
-		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
-		result = true
-	end
-	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
-		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
-		result = true
-	end
-	return result
 end
 
 function getDestinationOppositeFromAgent(res)

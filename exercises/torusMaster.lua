@@ -35,7 +35,7 @@ function initializeAgent()
 	SPEED_PREDATOR = 1	--This controls how many steps the predator should skip.
 	SPEED_PREY = 5		--This controls how many steps the prey should skip, the lager value the slower agent
 	STARTING_FOOD = 10
-	MAX_FOOD = 1
+	MAX_FOOD = 10
 
 	Shared.storeNumber(0, MAX_PREDATOR, true)
 	Shared.storeNumber(1, MAX_PREY, true)
