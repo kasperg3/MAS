@@ -68,8 +68,7 @@ function takeStep()
 		if Torus.reachedDestination(gotoX, gotoY) == true then
 			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 			gotoY = Stat.randomInteger(0, ENV_WIDTH)
-		end
-		if Moving == false then
+		elseif Moving == false then
 			Moving = true
 			Torus.move(gotoX, gotoY, G, color)
 		end
