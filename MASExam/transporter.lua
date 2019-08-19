@@ -30,56 +30,117 @@ Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 Torus = require "torus"
 
+--FIFO 
+FIFO = require "fifo"
+memory = FIFO():setempty(function() return nil end)
 
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
 	say("Agent #: " .. ID .. " has been initialized")
-	Agent.changeColor{g=255}
+	Agent.changeColor{g=255}	
+	color = {0, 255, 0}	
+
+	-- parameters
+	energy = Shared.getNumber(1) -- current energy
+	FULL_ENERGY = Shared.getNumber(1)
+	LOW_ENERGY = Shared.getNumber(2)
+	G = Shared.getNumber(3)
+	P = Shared.getNumber(4)
+	Q = Shared.getNumber(5)
+	W = Shared.getNumber(7)
+	oreStored = 0
+	oreLocated = false
+	doScan = false
+	base = false -- not at base (for now)
 
 	gotoX = PositionX -- Starts in reachedDestination and gets a new one
 	gotoY = PositionY -- Starts in reachedDestination and gets a new one
 
-	oreX = 0 -- initialize
-	oreY = 0 -- initalize
+	baseX = PositionX
+	baseY = PositionY
 
-	withinRangeOfOre = false -- initalize
-	oreLocated = false -- initalize
-
-	G = Shared.getNumber(3)
 end
 
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	if eventDescription == "oreDetected" then 
+	--TODO: CHECK RANGE
+	if eventDescription == "oreDetected" and oreLocated == false then 
 		oreLocated = true
-		oreX = sourceX
-		oreY = sourceY
+		
+		for i = 1, memory:length() do 
+			if memory:peek(i)["oreX"] == eventTable["oreX"] and memory:peek(i)["oreY"] == eventTable["oreY"] then
+				memory:remove(i)
+			end
+		end
+		memory:push({eventTable["oreX"],eventTable["oreY"]})
+
+		say("TRANSPORTER: MEMORY SIZE: " .. memory:length())
+
 	end
 end
 
 
 
 function takeStep()
-	if oreLocated == false then	
-		if Torus.reachedDestination(gotoX, gotoY) == true then
-			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-			gotoY = Stat.randomInteger(0, ENV_WIDTH)
-		elseif Moving == false then		
+	local LOW_ENERGY = ENV_HEIGHT * 0.7
+	if Moving == false then
+		if energy < 0 then
+			say("AGENT DIED!")
+			Map.modifyColor(PositionX,PositionY,{0,0,0})
+			Agent.removeAgent(ID)
+		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
+			--charge
+			energy = FULL_ENERGY
+		elseif energy < LOW_ENERGY then
+			-- return base
+			Moving = true
+			Torus.move(baseX, baseY, G, color)
+			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
+			energy = energy - Q 
+		elseif oreStored == W then
+				--say("Stored ores" )
+				if Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 then
+					energy = FULL_ENERGY
+					oreStored = 0
+				else
+					Moving = true
+					Torus.move(baseX, baseY, G, color)
+					energy = energy - Q
+					say("STORAGE FULL GOING TO BASE")
+				end
+		elseif oreLocated == true then
+			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
+				oreLocated = false
+				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreDepleted", table={oreX = memory:peek()[1], oreY = memory:peek()[2]}}
+				say("TRANSPORTER: " .. "ORE: " ..  memory:peek()[1] .. " " .. memory:peek()[2])
+				memory:pop() --Remove ore from memory
+				energy = energy - 1
+				oreStored = oreStored + 1
+			else
+				Moving = true
+				--say("MOVING TO ORE: " .. memory:peek()[1] .. " " .. memory:peek()[2])
+				Torus.move(memory:peek()[1], memory:peek()[2], G, color)
+				energy = energy - Q
+			end
+
+		else
+			-- random Movement
+			if Torus.reachedDestination(gotoX, gotoY) == true then
+				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+				gotoY = Stat.randomInteger(0, ENV_WIDTH)
+			else
 				Moving = true
 				Torus.move(gotoX, gotoY, G, color)
-		end
-	elseif oreLocated == true then
-		Moving = true
-		Torus.move(oreX,oreY, G, color)
-		if math.abs(PositionX - oreX) < 2 and math.abs(PositionY - oreY) < 2 then
-			carryOre = true
-			oreLocated = false
-			Event.emit{sourceX = oreX, sourceY = oreY, speed=1000, description="oreDepleted"}
+				--say("movement: "..Q * Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
+				energy = energy - Q
+			end
+
 		end
 	end
 end
+
 
 
 function cleanUp()

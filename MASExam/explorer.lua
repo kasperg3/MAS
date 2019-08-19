@@ -67,7 +67,6 @@ end
 function takeStep()
 	LOW_ENERGY = ENV_HEIGHT * 0.7
 	if Moving == false then
-		say("energy left: "..energy)
 		if energy < 0 then
 			say("AGENT DIED!")
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
@@ -83,7 +82,9 @@ function takeStep()
 			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 			energy = energy - Q 
 		elseif ores then
-			Event.emit{sourceX = ores[1]["posX"], sourceY = ores[1]["posY"], speed=1000, description="oreDetected"}
+			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = {oreX=ores[1]["posX"], oreY=ores[1]["posY"]}}
+			say("Explorer: " .. "ORE AT:" .. ores[1]["posX"] .. " " .. ores[1]["posY"] )
+			say("Explorer: " .. "EXPLORER AT:" .. PositionX .. " " .. PositionY )
 			energy = energy - 1	
 			ores = nil
 

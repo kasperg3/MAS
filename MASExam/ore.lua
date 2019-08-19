@@ -41,7 +41,11 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	if eventDescription == "oreDepleted" then
+
+
+	if eventDescription == "oreDepleted" and eventTable["oreX"] == PositionX and eventTable["oreY"] == PositionY then
+		say("ORE:" .. "source" .. eventTable["oreX"] .. " " .. eventTable["oreY"] .. " Position: " .. PositionX .. " " .. PositionY)
+		Map.modifyColor(PositionX,PositionY,{0,0,0})	
 		Agent.removeAgent(ID)
 	end
 end

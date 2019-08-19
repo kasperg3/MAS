@@ -27,3 +27,8 @@ Base:
 
 Q:
 	- Storage of coordinates, is the base coordinate counted as memory usage (S < (X + Y + N))
+
+LOW ENERGY METRIC:
+	- Half the distance of the map
+	- The shortest distance to the base + a safety factor
+
