@@ -34,8 +34,6 @@ Shared = require "ranalib_shared"
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
-	PositionX = Stat.randomInteger(0, ENV_HEIGHT)
-	PositionY = Stat.randomInteger(0, ENV_WIDTH)
 	capacity = Shared.getNumber(0)
 
 	say("Agent #: " .. ID .. " has been initialized")

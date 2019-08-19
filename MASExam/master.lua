@@ -29,9 +29,9 @@ function initializeAgent()
 	Agent.changeColor{b=255}
 	
 	-- PARAMETERS	
-	O = 0 -- ores
+	O = 1 -- ores
 	X = 1 -- explorer
-	Y = 0 -- transporters
+	Y = 1 -- transporters
 	G = 0 -- grid
 	N = 2 -- bases
 	M = false -- cooperative mode
@@ -54,13 +54,16 @@ function initializeAgent()
 	end
 	
 	for i=0, (N - 1) do -- For each base, initialize X + Y
-		Agent.addAgent("base.lua")
+		--x = Stat.randomInteger(0, ENV_HEIGHT)
+		y = Stat.randomInteger(0, ENV_WIDTH)
+		x = 5
+		Agent.addAgent("base.lua", x, y)
 		for i=0, (X - 1) do
-			Agent.addAgent("explorer.lua")
+			Agent.addAgent("explorer.lua", x, y)
 		end
 	
 		for i=0, (Y - 1) do
-			Agent.addAgent("transporter.lua")
+			Agent.addAgent("transporter.lua", x, y)
 		end
 	end
 

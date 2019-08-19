@@ -35,8 +35,6 @@ function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
 	say("Agent #: " .. ID .. " has been initialized")
-	PositionX = Stat.randomInteger(0, ENV_HEIGHT)
-	PositionY = Stat.randomInteger(0, ENV_WIDTH)
 	Agent.changeColor{r=255}		
 
 end
