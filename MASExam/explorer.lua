@@ -28,18 +28,30 @@ Map = require "ranalib_map"
 Stat = require "ranalib_statistic"
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
---Torus = require "torus"
+Torus = require "torus"
 
 
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
 	say("Agent #: " .. ID .. " has been initialized")
-	Agent.changeColor{r=255}		
+	Agent.changeColor{r=255}	
+	color = {255, 0, 0}	
+
+	-- parameters
+	energy = Shared.getNumber(1)
+	LOW_ENERGY = Shared.getNumber(2)
+	G = Shared.getNumber(3)
+	P = Shared.getNumber(4)
+
+	doScan = false
+	base = false -- not at base (for now)
+
+	gotoX = PositionX -- Starts in reachedDestination and gets a new one
+	gotoY = PositionY -- Starts in reachedDestination and gets a new one
+
 
 end
-
-
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	
@@ -48,7 +60,30 @@ end
 
 
 function takeStep()
-	
+	if base == true then
+		--charge
+		say("base")
+	elseif energy < LOW_ENERGY then
+		-- return base
+		say("energy")
+	elseif doScan == false then
+		-- random Movement
+		if Torus.reachedDestination(gotoX, gotoY) == true then
+			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+			gotoY = Stat.randomInteger(0, ENV_WIDTH)
+			doScan = true 
+		elseif Moving == false then
+			Moving = true
+			Torus.move(gotoX, gotoY, G, color)
+		end
+	elseif doScan == true then
+		-- scan
+		ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
+		doScan = false
+		if ores then
+			Event.emit{sourceX = ores[1]["posX"], sourceY = ores[1]["posY"], speed=1000, description="OreDetected"}
+		end
+	end
 end
 
 
