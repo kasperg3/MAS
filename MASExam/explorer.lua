@@ -39,16 +39,21 @@ function initializeAgent()
 	color = {255, 0, 0}	
 
 	-- parameters
-	energy = Shared.getNumber(1)
+	energy = Shared.getNumber(1) -- current energy
+	FULL_ENERGY = Shared.getNumber(1)
 	LOW_ENERGY = Shared.getNumber(2)
 	G = Shared.getNumber(3)
 	P = Shared.getNumber(4)
+	Q = Shared.getNumber(5)
 
 	doScan = false
 	base = false -- not at base (for now)
 
 	gotoX = PositionX -- Starts in reachedDestination and gets a new one
 	gotoY = PositionY -- Starts in reachedDestination and gets a new one
+
+	baseX = PositionX
+	baseY = PositionY
 
 
 end
@@ -60,28 +65,44 @@ end
 
 
 function takeStep()
-	if base == true then
-		--charge
-		say("base")
-	elseif energy < LOW_ENERGY then
-		-- return base
-		say("energy")
-	elseif doScan == false then
-		-- random Movement
-		if Torus.reachedDestination(gotoX, gotoY) == true then
-			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-			gotoY = Stat.randomInteger(0, ENV_WIDTH)
-			doScan = true 
-		elseif Moving == false then
+	LOW_ENERGY = ENV_HEIGHT * 0.7
+	if Moving == false then
+		say("energy left: "..energy)
+		if energy < 0 then
+			say("AGENT DIED!")
+			Map.modifyColor(PositionX,PositionY,{0,0,0})
+			Agent.removeAgent(ID)
+
+		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
+			--charge
+			energy = FULL_ENERGY
+		elseif energy < LOW_ENERGY then
+			-- return base
 			Moving = true
-			Torus.move(gotoX, gotoY, G, color)
-		end
-	elseif doScan == true then
-		-- scan
-		ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
-		doScan = false
-		if ores then
-			Event.emit{sourceX = ores[1]["posX"], sourceY = ores[1]["posY"], speed=1000, description="OreDetected"}
+			Torus.move(baseX, baseY, G, color)
+			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
+			energy = energy - Q 
+		elseif ores then
+			Event.emit{sourceX = ores[1]["posX"], sourceY = ores[1]["posY"], speed=1000, description="oreDetected"}
+			energy = energy - 1	
+			ores = nil
+
+		elseif doScan == false then
+			-- random Movement
+			if Torus.reachedDestination(gotoX, gotoY) == true then
+				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+				gotoY = Stat.randomInteger(0, ENV_WIDTH)
+				doScan = true 
+			else
+				Moving = true
+				Torus.move(gotoX, gotoY, G, color)
+				--say("movement: "..Q * Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
+				energy = energy - Q
+			end
+		elseif doScan == true then
+			ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
+			energy = energy - P
+			doScan = false
 		end
 	end
 end

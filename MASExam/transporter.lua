@@ -28,27 +28,57 @@ Map = require "ranalib_map"
 Stat = require "ranalib_statistic"
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
---Torus = require "torus"
+Torus = require "torus"
 
 
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
 	say("Agent #: " .. ID .. " has been initialized")
-	Agent.changeColor{g=255}	
+	Agent.changeColor{g=255}
 
+	gotoX = PositionX -- Starts in reachedDestination and gets a new one
+	gotoY = PositionY -- Starts in reachedDestination and gets a new one
+
+	oreX = 0 -- initialize
+	oreY = 0 -- initalize
+
+	withinRangeOfOre = false -- initalize
+	oreLocated = false -- initalize
+
+	G = Shared.getNumber(3)
 end
 
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	
+	if eventDescription == "oreDetected" then 
+		oreLocated = true
+		oreX = sourceX
+		oreY = sourceY
+	end
 end
 
 
 
 function takeStep()
-	
+	if oreLocated == false then	
+		if Torus.reachedDestination(gotoX, gotoY) == true then
+			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+			gotoY = Stat.randomInteger(0, ENV_WIDTH)
+		elseif Moving == false then		
+				Moving = true
+				Torus.move(gotoX, gotoY, G, color)
+		end
+	elseif oreLocated == true then
+		Moving = true
+		Torus.move(oreX,oreY, G, color)
+		if math.abs(PositionX - oreX) < 2 and math.abs(PositionY - oreY) < 2 then
+			carryOre = true
+			oreLocated = false
+			Event.emit{sourceX = oreX, sourceY = oreY, speed=1000, description="oreDepleted"}
+		end
+	end
 end
 
 

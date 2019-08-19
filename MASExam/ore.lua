@@ -35,20 +35,22 @@ function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
 	say("Agent #: " .. ID .. " has been initialized")
-	Agent.changeColor{r=255,g=255, b=255}	
-
+	Agent.changeColor{r=255, g=255, b=255}	
 end
 
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	
+	if eventDescription == "oreDepleted" then
+		Agent.removeAgent(ID)
+	end
 end
 
 
 
 function takeStep()
-	
+	Collision.updatePosition(PositionX,PositionY)
+	Map.modifyColor(PositionX,PositionY,{255,255,255})
 end
 
 
