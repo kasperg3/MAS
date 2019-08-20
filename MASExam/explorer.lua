@@ -83,8 +83,8 @@ function takeStep()
 			energy = energy - Q 
 		elseif ores then
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = {oreX=ores[1]["posX"], oreY=ores[1]["posY"]}}
-			say("Explorer: " .. "ORE AT:" .. ores[1]["posX"] .. " " .. ores[1]["posY"] )
-			say("Explorer: " .. "EXPLORER AT:" .. PositionX .. " " .. PositionY )
+			--say("Explorer: " .. "ORE AT:" .. ores[1]["posX"] .. " " .. ores[1]["posY"] )
+			--say("Explorer: " .. "EXPLORER AT:" .. PositionX .. " " .. PositionY )
 			energy = energy - 1	
 			ores = nil
 

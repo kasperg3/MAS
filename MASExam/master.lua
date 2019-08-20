@@ -29,17 +29,17 @@ function initializeAgent()
 	Agent.changeColor{b=255}
 	
 	-- PARAMETERS from exercise	
-	O = 2 -- ores
-	X = 1 -- explorer
+	O = 4 -- ores
+	X = 10 -- explorer
 	Y = 1 -- transporters
 	G = ENV_WIDTH -- grid
 	N = 1 -- bases
 	M = false -- cooperative mode
 	D = 0 -- density
-	I = 0 -- communication scope
+	I = G/5-1 -- communication scope
 	P = 50 -- perception scope
 	W = 2 -- limited capacity of robots
-	C = 0 -- capacity of base
+	C = 3 -- capacity of base
 	E = 100000 -- energy
 	Q = 0 -- cost of sending message
 	T = 0 -- time t to return to the base
@@ -58,6 +58,7 @@ function initializeAgent()
 	Shared.storeNumber(5, Q, true)
 	Shared.storeNumber(6, S, true)
 	Shared.storeNumber(7, W, true)
+	Shared.storeNumber(8,I,true)
 
 	-- initializAgents
 	for i=0, (O - 1) do

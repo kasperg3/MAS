@@ -28,14 +28,14 @@ Map = require "ranalib_map"
 Stat = require "ranalib_statistic"
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
---Torus = require "torus"
+Torus = require "torus"
 
 
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
-	capacity = Shared.getNumber(0)
-
+	maxCapacity = Shared.getNumber(0)
+	storedOres = 0
 	say("Agent #: " .. ID .. " has been initialized")
 	Agent.changeColor{b=255}	
 
@@ -44,7 +44,20 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	
+
+	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < 2 then
+		if eventDescription == "unloadingOre" then
+			--say("BASE: unloadingOre")
+			if storedOres + eventTable["ores"] <= maxCapacity then --If all ores are accepted
+				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=0, destinationID=sourceID}}
+				storedOres = storedOres + eventTable["ores"]
+				say("BASE: all ores accepted")
+			else 
+				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=((storedOres + eventTable["ores"]) - maxCapacity)}, destinationID=sourceID}
+				say("BASE: not enough capacity, returning " .. ((storedOres + eventTable["ores"]) - maxCapacity) .. " ores")
+			end
+		end
+	end
 end
 
 

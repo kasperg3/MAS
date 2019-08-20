@@ -49,11 +49,12 @@ function initializeAgent()
 	P = Shared.getNumber(4)
 	Q = Shared.getNumber(5)
 	W = Shared.getNumber(7)
+	I = Shared.getNumber(8)
 	oreStored = 0
 	oreLocated = false
 	doScan = false
 	base = false -- not at base (for now)
-
+	unloadingOreSend = false
 	gotoX = PositionX -- Starts in reachedDestination and gets a new one
 	gotoY = PositionY -- Starts in reachedDestination and gets a new one
 
@@ -65,23 +66,31 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	--TODO: CHECK RANGE
-	if eventDescription == "oreDetected" and oreLocated == false then 
-		oreLocated = true
-		
-		for i = 1, memory:length() do 
-			if memory:peek(i)["oreX"] == eventTable["oreX"] and memory:peek(i)["oreY"] == eventTable["oreY"] then
-				memory:remove(i)
+		--TODO: CHECK RANGE
+	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
+		if eventDescription == "oreDetected" and oreLocated == false then 
+			oreLocated = true
+			for i = 1, memory:length() do 
+				if memory:peek(i)["oreX"] == eventTable["oreX"] and memory:peek(i)["oreY"] == eventTable["oreY"] then
+					memory:remove(i)
+				end
+			end
+			memory:push({eventTable["oreX"],eventTable["oreY"]})
+		end
+
+		if eventDescription == "oreStored" then
+			if eventTable["destinationID"] == ID then
+				unloadingOreSend = false
+				oreStored = eventTable["oresReturned"]	
+				if oreStored ~= 0 then
+					--FIND NEW BASE	
+					baseX = PositionX + 20
+					baseY = PositionY + 20
+				end
 			end
 		end
-		memory:push({eventTable["oreX"],eventTable["oreY"]})
-
-		say("TRANSPORTER: MEMORY SIZE: " .. memory:length())
-
 	end
 end
-
-
 
 function takeStep()
 	local LOW_ENERGY = ENV_HEIGHT * 0.7
@@ -93,40 +102,35 @@ function takeStep()
 		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
 			--charge
 			energy = FULL_ENERGY
-		elseif energy < LOW_ENERGY then
-			-- return base
+			if unloadingOreSend == false and oreStored ~= 0 then --If in base to charge, unload ores if carrying any
+				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="unloadingOre", table={ores=oreStored}}
+				unloadingOreSend = true
+				say("TRANSPORTER: sending unloadingOre request for " .. oreStored .. "ores" )
+			end
+		elseif energy < LOW_ENERGY then -- If low energy return to base
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
-			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 			energy = energy - Q 
-		elseif oreStored == W then
-				--say("Stored ores" )
-				if Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 then
-					energy = FULL_ENERGY
-					oreStored = 0
-				else
-					Moving = true
-					Torus.move(baseX, baseY, G, color)
-					energy = energy - Q
-					say("STORAGE FULL GOING TO BASE")
-				end
-		elseif oreLocated == true then
+		elseif oreStored == W then -- If capacity reached, unload to base
+			--say("Stored ores" )
+			Moving = true
+			Torus.move(baseX, baseY, G, color)
+			energy = energy - Q
+
+		elseif oreLocated == true then 
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
 				oreLocated = false
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreDepleted", table={oreX = memory:peek()[1], oreY = memory:peek()[2]}}
-				say("TRANSPORTER: " .. "ORE: " ..  memory:peek()[1] .. " " .. memory:peek()[2])
+				--say("TRANSPORTER: " .. "ORE: " ..  memory:peek()[1] .. " " .. memory:peek()[2])
 				memory:pop() --Remove ore from memory
 				energy = energy - 1
 				oreStored = oreStored + 1
 			else
 				Moving = true
-				--say("MOVING TO ORE: " .. memory:peek()[1] .. " " .. memory:peek()[2])
 				Torus.move(memory:peek()[1], memory:peek()[2], G, color)
 				energy = energy - Q
 			end
-
-		else
-			-- random Movement
+		else -- random Movement
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 				gotoY = Stat.randomInteger(0, ENV_WIDTH)
