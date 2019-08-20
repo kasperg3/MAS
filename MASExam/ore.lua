@@ -34,7 +34,7 @@ Shared = require "ranalib_shared"
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
-	say("Agent #: " .. ID .. " has been initialized")
+	--say("Agent #: " .. ID .. " has been initialized")
 	Agent.changeColor{r=255, g=255, b=255}	
 end
 
@@ -44,7 +44,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 
 
 	if eventDescription == "oreDepleted" and eventTable["oreX"] == PositionX and eventTable["oreY"] == PositionY then
-		say("ORE:" .. "source" .. eventTable["oreX"] .. " " .. eventTable["oreY"] .. " Position: " .. PositionX .. " " .. PositionY)
+		--say("ORE:" .. "source" .. eventTable["oreX"] .. " " .. eventTable["oreY"] .. " Position: " .. PositionX .. " " .. PositionY)
 		Map.modifyColor(PositionX,PositionY,{0,0,0})	
 		Agent.removeAgent(ID)
 	end
@@ -59,6 +59,6 @@ end
 
 
 function cleanUp()
-	say("Agent #: " .. ID .. " is done\n")
+	--say("Agent #: " .. ID .. " is done\n")
 	Map.modifyColor(PositionX,PositionY,{0,0,0})	
 end

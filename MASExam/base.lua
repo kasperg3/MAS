@@ -36,7 +36,7 @@ function initializeAgent()
 	GridMovement = true	-- Visible is the collision grid
 	maxCapacity = Shared.getNumber(0)
 	storedOres = 0
-	say("Agent #: " .. ID .. " has been initialized")
+	--say("Agent #: " .. ID .. " has been initialized")
 	Agent.changeColor{b=255}	
 
 end
@@ -44,16 +44,19 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
+	if eventDescription == "getOres" then
+		Event.emit{speed=1000000, description="oresCollected", table={ores=storedOres}}
+	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < 2 then
 		if eventDescription == "unloadingOre" then
 			--say("BASE: unloadingOre")
 			if storedOres + eventTable["ores"] <= maxCapacity then --If all ores are accepted
-				say("BASE: received from ID: " .. sourceID)	
+				--say("BASE: received from ID: " .. sourceID)	
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=0, destinationID=sourceID}}
 				storedOres = storedOres + eventTable["ores"]
-				say("BASE: all ores accepted")
+				--say("BASE: all ores accepted")
 			else 
-				say("BASE: received from ID: " .. sourceID)
+				--say("BASE: received from ID: " .. sourceID)
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=((storedOres + eventTable["ores"]) - maxCapacity), destinationID=sourceID}}
 				say("BASE: not enough capacity, returning " .. ((storedOres + eventTable["ores"]) - maxCapacity) .. " ores")
 			end
@@ -70,6 +73,6 @@ end
 
 
 function cleanUp()
-	say("Agent #: " .. ID .. " is done\n")
+	--say("Agent #: " .. ID .. " is done\n")
 	Map.modifyColor(PositionX,PositionY,{0,0,0})	
 end

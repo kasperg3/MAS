@@ -34,7 +34,7 @@ Torus = require "torus"
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
-	say("Agent #: " .. ID .. " has been initialized")
+	--say("Agent #: " .. ID .. " has been initialized")
 	Agent.changeColor{r=255}	
 	color = {255, 0, 0}	
 
@@ -72,6 +72,7 @@ function takeStep()
 	if Moving == false then
 		if energy < 0 then
 			say("AGENT DIED!")
+			Event.emit{speed=1000000, description="deadAgent"}
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
 			Agent.removeAgent(ID)
 		elseif timeIsUp == true then
@@ -80,8 +81,11 @@ function takeStep()
 				Moving = true
 				Torus.move(baseX, baseY, G, color)
 				energy = energy - Q 
+				--say("moving towards base")
 			else
-				-- do nothing
+				Collision.updatePosition(-1,-1)
+				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
+				Agent.removeAgent(ID) -- remove to make space for others
 			end
 
 		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
@@ -122,6 +126,6 @@ end
 
 
 function cleanUp()
-	say("Agent #: " .. ID .. " is done\n")
+	--say("Agent #: " .. ID .. " is done\n")
 	Map.modifyColor(PositionX,PositionY,{0,0,0})	
 end

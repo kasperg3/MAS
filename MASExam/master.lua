@@ -32,20 +32,21 @@ function initializeAgent()
 	PositionX = ENV_WIDTH + 10
 	PositionY = ENV_HEIGHT + 10
 	callBackUnits = false
+	printResults = false
+	getOres = false
 	
 	-- PARAMETERS from exercise	
-	O = 10-- ores
-	X = 10 -- explorer
-	Y = 10-- transporters
+	D = 100-- ores
+	X = 5 -- explorer
+	Y = 5-- transporters
 	G = ENV_WIDTH -- grid
-	N = 1 -- bases
+	N = 3 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
-	D = 0 -- density
 	I = G/5-1 -- communication scope
 	P = 50 -- perception scope
-	W = 1 -- limited capacity of robots
-	C = 5 -- capacity of base
-	E = 100000 -- energy
+	W = 10 -- limited capacity of robots
+	C = 100 -- capacity of base
+	E = 500 -- energy
 	Q = 0 -- cost of sending message
 	T = 1 -- time t to return to the base [SEC]
 	S = X + Y - 1 -- memory of robots/bases 
@@ -53,6 +54,8 @@ function initializeAgent()
 
 	-- Own PARAMETERS
 	LOW_ENERGY = 50
+	deadAgents = 0
+	totalOres = 0
 
 	-- Shared values
 	Shared.storeNumber(0, C, true)
@@ -68,11 +71,11 @@ function initializeAgent()
 
 
 	-- initializAgents
-	for i=0, (O - 1) do
+	for i=0, (D - 1) do
 		Agent.addAgent("ore.lua")
 	end
 
-	Agent.addAgent("base.lua", x, y) -- empty base NO explorers or transporters -- used for test
+	--Agent.addAgent("base.lua", x, y) -- empty base NO explorers or transporters -- used for test
 	
 	for i=0, (N - 1) do -- For each base, initialize X + Y with certain x, y
 		x = Stat.randomInteger(0, ENV_HEIGHT)
@@ -89,7 +92,16 @@ function initializeAgent()
 	end
 
 	startTime = Core.time()
-	say("Start time:" .. startTime)
+end
+
+function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
+	if eventDescription == "deadAgent" then
+		deadAgents = deadAgents + 1
+	end 
+	if eventDescription == "oresCollected" then
+		--say("adding ores.." .. eventTable["ores"])
+		totalOres = totalOres + eventTable["ores"] 
+	end
 end
 
 function takeStep()
@@ -98,5 +110,18 @@ function takeStep()
 		say("timesUpThatsTheNameOfTheGame")
 		Event.emit{speed=1000000, description="timesUp"}
 		callBackUnits = true
+	end
+
+	-- When all robots home / after certain time t
+	if (Core.time() - startTime) > T+1 and getOres == false then
+		Event.emit{speed=1000000, description="getOres"}
+		getOres = true
+	end
+	if (Core.time() - startTime) > T+1.2 and printResults == false then
+		say("-- RESULTS --")
+		say("Alive robots: " .. X+Y-deadAgents .. " out of " .. X+Y .. " | percentage: " .. ((X+Y-deadAgents)/(X+Y))*100)
+		say("Ores collected: " ..  totalOres .. " out of " .. D .. " | percentage: ")
+		say("Time spent: " .. T)
+		printResults = true
 	end
 end

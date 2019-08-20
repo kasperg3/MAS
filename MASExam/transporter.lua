@@ -37,7 +37,7 @@ memory = FIFO():setempty(function() return nil end)
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
-	say("Agent #: " .. ID .. " has been initialized")
+	--say("Agent #: " .. ID .. " has been initialized")
 	Agent.changeColor{g=255}	
 	color = {0, 255, 0}	
 
@@ -102,6 +102,7 @@ function takeStep()
 	if Moving == false then
 		if energy < 0 then
 			say("AGENT DIED!")
+			Event.emit{speed=1000000, description="deadAgent"}
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
 			Agent.removeAgent(ID)
 		elseif timeIsUp == true then
@@ -129,11 +130,14 @@ function takeStep()
 					end
 				end
 			elseif Torus.reachedDestination(baseX, baseY) == false then
+				--say("moving towards base")
 				Moving = true
 				Torus.move(baseX, baseY, G, color)
 				energy = energy - Q 
 			else
-				-- do nothing
+				Collision.updatePosition(-1,-1)
+				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
+				Agent.removeAgent(ID) -- remove to make space for others
 			end
 		elseif baseX == nil and baseY == nil then
 			if M == 0 then
@@ -168,7 +172,7 @@ function takeStep()
 				Event.emit{sourceX = PostionX, sourceY = PositionY, sourceID = ID, speed=1000000, description="unloadingOre", table={ores=oreStored}}
 				-- In base no need to retract energy
 				unloadingOreSend = true
-				say("TRANSPORTER: sending unloadingOre request for " .. oreStored .. "ores" )
+				--say("TRANSPORTER: sending unloadingOre request for " .. oreStored .. "ores" )
 			end
 		elseif energy < LOW_ENERGY then -- If low energy return to base
 			--say("T: low energy")
@@ -212,6 +216,6 @@ end
 
 
 function cleanUp()
-	say("Agent #: " .. ID .. " is done\n")
+	--say("Agent #: " .. ID .. " is done\n")
 	Map.modifyColor(PositionX,PositionY,{0,0,0})	
 end
