@@ -44,16 +44,17 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < 2 then
 		if eventDescription == "unloadingOre" then
 			--say("BASE: unloadingOre")
 			if storedOres + eventTable["ores"] <= maxCapacity then --If all ores are accepted
+				say("BASE: received from ID: " .. sourceID)	
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=0, destinationID=sourceID}}
 				storedOres = storedOres + eventTable["ores"]
 				say("BASE: all ores accepted")
 			else 
-				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=((storedOres + eventTable["ores"]) - maxCapacity)}, destinationID=sourceID}
+				say("BASE: received from ID: " .. sourceID)
+				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreStored", table={oresReturned=((storedOres + eventTable["ores"]) - maxCapacity), destinationID=sourceID}}
 				say("BASE: not enough capacity, returning " .. ((storedOres + eventTable["ores"]) - maxCapacity) .. " ores")
 			end
 		end
@@ -63,7 +64,8 @@ end
 
 
 function takeStep()
-	
+	Collision.updatePosition(PositionX,PositionY)
+	Map.modifyColor(PositionX,PositionY,{0,0,255})
 end
 
 

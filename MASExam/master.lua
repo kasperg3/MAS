@@ -29,17 +29,17 @@ function initializeAgent()
 	Agent.changeColor{b=255}
 	
 	-- PARAMETERS from exercise	
-	O = 4 -- ores
-	X = 10 -- explorer
+	O = 3-- ores
+	X = 5 -- explorer
 	Y = 1 -- transporters
 	G = ENV_WIDTH -- grid
 	N = 1 -- bases
-	M = false -- cooperative mode
+	M = 0 -- cooperative mode -- 0 = true, 1 = false 
 	D = 0 -- density
 	I = G/5-1 -- communication scope
-	P = 50 -- perception scope
-	W = 2 -- limited capacity of robots
-	C = 3 -- capacity of base
+	P = 150 -- perception scope
+	W = 1 -- limited capacity of robots
+	C = 2 -- capacity of base
 	E = 100000 -- energy
 	Q = 0 -- cost of sending message
 	T = 0 -- time t to return to the base
@@ -58,12 +58,16 @@ function initializeAgent()
 	Shared.storeNumber(5, Q, true)
 	Shared.storeNumber(6, S, true)
 	Shared.storeNumber(7, W, true)
-	Shared.storeNumber(8,I,true)
+	Shared.storeNumber(8, I,true)
+	Shared.storeNumber(9, M, true)
+
 
 	-- initializAgents
 	for i=0, (O - 1) do
 		Agent.addAgent("ore.lua")
 	end
+
+	Agent.addAgent("base.lua", x, y) -- empty base NO explorers or transporters -- used for test
 	
 	for i=0, (N - 1) do -- For each base, initialize X + Y with certain x, y
 		x = Stat.randomInteger(0, ENV_HEIGHT)

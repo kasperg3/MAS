@@ -50,6 +50,7 @@ function initializeAgent()
 	Q = Shared.getNumber(5)
 	W = Shared.getNumber(7)
 	I = Shared.getNumber(8)
+	M = Shared.getNumber(9)
 	oreStored = 0
 	oreLocated = false
 	doScan = false
@@ -60,13 +61,13 @@ function initializeAgent()
 
 	baseX = PositionX
 	baseY = PositionY
+	scanForBase = false
 
 end
 
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-		--TODO: CHECK RANGE
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
 		if eventDescription == "oreDetected" and oreLocated == false then 
 			oreLocated = true
@@ -79,13 +80,18 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		end
 
 		if eventDescription == "oreStored" then
+			say("T: I received event: orestored")
+			say("T: I got " .. eventTable["oresReturned"] .. " ores back")	
+			say("T: ID received: " .. eventTable["destinationID"] .." my ID: " .. ID) 
 			if eventTable["destinationID"] == ID then
 				unloadingOreSend = false
-				oreStored = eventTable["oresReturned"]	
+				oreStored = eventTable["oresReturned"]
+				say("T: I got " .. oreStored .. " ores back")	
 				if oreStored ~= 0 then
+					say("I need a new base..")
 					--FIND NEW BASE	
-					baseX = PositionX + 20
-					baseY = PositionY + 20
+					baseX = nil
+					baseY = nil
 				end
 			end
 		end
@@ -99,29 +105,60 @@ function takeStep()
 			say("AGENT DIED!")
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
 			Agent.removeAgent(ID)
+		elseif baseX == nil and baseY == nil then
+			if M == 0 then
+				--say("fuck dude, I need a base")
+				if scanForBase == true then
+					--say("scanning for a base")
+					base = Torus.squareSpiralTorusScanColor(P,{0,0,255}, G)
+					scanForBase = false
+					energy = energy - P
+					if base ~= nil then
+						say("found a base!!")
+						baseX = base[1]["posX"]
+						baseY = base[1]["posY"]
+					end
+				else
+					if Torus.reachedDestination(gotoX, gotoY) == true then
+						--say("I made a moving for a new base")
+						gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+						gotoY = Stat.randomInteger(0, ENV_WIDTH)
+						scanForBase = true
+					else
+						Moving = true
+						Torus.move(gotoX, gotoY, G, color)
+						energy = energy - Q
+					end
+				end
+			else
+				say("nothing more for me to do..")
+				-- can't do more, camp at base
+			end
 		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
-			--charge
+			--say("T: at base")
 			energy = FULL_ENERGY
 			if unloadingOreSend == false and oreStored ~= 0 then --If in base to charge, unload ores if carrying any
-				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="unloadingOre", table={ores=oreStored}}
+				Event.emit{sourceX = PostionX, sourceY = PositionY, sourceID = ID, speed=1000000, description="unloadingOre", table={ores=oreStored}}
+				-- In base no need to retract energy
 				unloadingOreSend = true
 				say("TRANSPORTER: sending unloadingOre request for " .. oreStored .. "ores" )
 			end
 		elseif energy < LOW_ENERGY then -- If low energy return to base
+			--say("T: low energy")
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
 			energy = energy - Q 
 		elseif oreStored == W then -- If capacity reached, unload to base
-			--say("Stored ores" )
+			--say("T: full capacity" )
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
 			energy = energy - Q
 
 		elseif oreLocated == true then 
+			--say("T: oreLocated")
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
 				oreLocated = false
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreDepleted", table={oreX = memory:peek()[1], oreY = memory:peek()[2]}}
-				--say("TRANSPORTER: " .. "ORE: " ..  memory:peek()[1] .. " " .. memory:peek()[2])
 				memory:pop() --Remove ore from memory
 				energy = energy - 1
 				oreStored = oreStored + 1
@@ -131,13 +168,13 @@ function takeStep()
 				energy = energy - Q
 			end
 		else -- random Movement
+			--say("T: random movement") 
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 				gotoY = Stat.randomInteger(0, ENV_WIDTH)
 			else
 				Moving = true
 				Torus.move(gotoX, gotoY, G, color)
-				--say("movement: "..Q * Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 				energy = energy - Q
 			end
 
