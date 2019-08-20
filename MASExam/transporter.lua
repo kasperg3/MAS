@@ -97,6 +97,28 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	end
 end
 
+function findBase()
+	if scanForBase == true then
+		base = Torus.squareSpiralTorusScanColor(P,{0,0,255}, G)
+		scanForBase = false
+		energy = energy - P
+		if base ~= nil then
+			baseX = base[1]["posX"]
+			baseY = base[1]["posY"]
+		end
+	else
+		if Torus.reachedDestination(gotoX, gotoY) == true then
+			gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+			gotoY = Stat.randomInteger(0, ENV_WIDTH)
+			scanForBase = true
+		else
+			Moving = true
+			Torus.move(gotoX, gotoY, G, color)
+			energy = energy - Q
+		end
+	end
+end
+
 function takeStep()
 	local LOW_ENERGY = ENV_HEIGHT * 0.7
 	if Moving == false then
@@ -107,28 +129,8 @@ function takeStep()
 			Agent.removeAgent(ID)
 		elseif timeIsUp == true then
 			--say("time is up")
-			if baseX == nil and baseY == nil then
-				say("i dont have a base :(")
-				if scanForBase == true then
-					base = Torus.squareSpiralTorusScanColor(P,{0,0,255}, G)
-					scanForBase = false
-					energy = energy - P
-					if base ~= nil then
-						--say("found a base!!")
-						baseX = base[1]["posX"]
-						baseY = base[1]["posY"]
-					end
-				else
-					if Torus.reachedDestination(gotoX, gotoY) == true then
-						gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-						gotoY = Stat.randomInteger(0, ENV_WIDTH)
-						scanForBase = true
-					else
-						Moving = true
-						Torus.move(gotoX, gotoY, G, color)
-						energy = energy - Q
-					end
-				end
+			if baseX == nil and baseY == nil then -- Find base
+				findBase()
 			elseif Torus.reachedDestination(baseX, baseY) == false then
 				--say("moving towards base")
 				Moving = true
@@ -139,31 +141,9 @@ function takeStep()
 				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
 				Agent.removeAgent(ID) -- remove to make space for others
 			end
-		elseif baseX == nil and baseY == nil then
+		elseif baseX == nil and baseY == nil then --Find base behaviour
 			if M == 0 then
-				if scanForBase == true then
-					base = Torus.squareSpiralTorusScanColor(P,{0,0,255}, G)
-					scanForBase = false
-					energy = energy - P
-					if base ~= nil then
-						say("found a base!!")
-						baseX = base[1]["posX"]
-						baseY = base[1]["posY"]
-					end
-				else
-					if Torus.reachedDestination(gotoX, gotoY) == true then
-						gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-						gotoY = Stat.randomInteger(0, ENV_WIDTH)
-						scanForBase = true
-					else
-						Moving = true
-						Torus.move(gotoX, gotoY, G, color)
-						energy = energy - Q
-					end
-				end
-			else
-				say("nothing more for me to do..")
-				-- can't do more, camp at base
+				findBase()
 			end
 		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
 			--say("T: at base")
