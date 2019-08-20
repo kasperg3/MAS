@@ -24,16 +24,19 @@ Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 Stat = require "ranalib_statistic"
 Map = require "ranalib_map"
+Core = require "ranalib_core"
+Event = require "ranalib_event"
 function initializeAgent()
 
 	Agent.changeColor{b=100, r=100, g=100}
 	PositionX = ENV_WIDTH + 10
 	PositionY = ENV_HEIGHT + 10
+	callBackUnits = false
 	
 	-- PARAMETERS from exercise	
-	O = 3-- ores
-	X = 5 -- explorer
-	Y = 5-- transporters
+	O = 10-- ores
+	X = 10 -- explorer
+	Y = 10-- transporters
 	G = ENV_WIDTH -- grid
 	N = 1 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
@@ -41,11 +44,11 @@ function initializeAgent()
 	I = G/5-1 -- communication scope
 	P = 50 -- perception scope
 	W = 1 -- limited capacity of robots
-	C = 2 -- capacity of base
+	C = 5 -- capacity of base
 	E = 100000 -- energy
 	Q = 0 -- cost of sending message
-	T = 0 -- time t to return to the base
-	S = X + Y - 1 -- memory of robots/bases
+	T = 1 -- time t to return to the base [SEC]
+	S = X + Y - 1 -- memory of robots/bases 
 	Q = 1 -- Cost of motion
 
 	-- Own PARAMETERS
@@ -84,8 +87,16 @@ function initializeAgent()
 			Agent.addAgent("transporter.lua", x, y)
 		end
 	end
-	local x = os.clock()
-    local s = 0
-    for i=1,10000 do s = s + i end
-    print(string.format("elapsed time: %.2f\n", os.clock() - x))
+
+	startTime = Core.time()
+	say("Start time:" .. startTime)
+end
+
+function takeStep()
+	--say("current time: " .. Core.time() - startTime)
+	if (Core.time() - startTime) > T and callBackUnits == false then
+		say("timesUpThatsTheNameOfTheGame")
+		Event.emit{speed=1000000, description="timesUp"}
+		callBackUnits = true
+	end
 end

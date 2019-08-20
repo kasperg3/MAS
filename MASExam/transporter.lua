@@ -62,12 +62,16 @@ function initializeAgent()
 	baseX = PositionX
 	baseY = PositionY
 	scanForBase = false
+	timeIsUp = false
 
 end
 
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
+	if eventDescription == "timesUp" then
+		timeIsUp = true
+	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
 		if eventDescription == "oreDetected" and oreLocated == false then 
 			oreLocated = true
@@ -83,7 +87,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 			if eventTable["destinationID"] == ID then
 				unloadingOreSend = false
 				oreStored = eventTable["oresReturned"]	
-				if oreStored ~= 0 then
+				if oreStored ~= 0 and M == 0 then
 					--FIND NEW BASE	
 					baseX = nil
 					baseY = nil
@@ -100,6 +104,37 @@ function takeStep()
 			say("AGENT DIED!")
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
 			Agent.removeAgent(ID)
+		elseif timeIsUp == true then
+			--say("time is up")
+			if baseX == nil and baseY == nil then
+				say("i dont have a base :(")
+				if scanForBase == true then
+					base = Torus.squareSpiralTorusScanColor(P,{0,0,255}, G)
+					scanForBase = false
+					energy = energy - P
+					if base ~= nil then
+						--say("found a base!!")
+						baseX = base[1]["posX"]
+						baseY = base[1]["posY"]
+					end
+				else
+					if Torus.reachedDestination(gotoX, gotoY) == true then
+						gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+						gotoY = Stat.randomInteger(0, ENV_WIDTH)
+						scanForBase = true
+					else
+						Moving = true
+						Torus.move(gotoX, gotoY, G, color)
+						energy = energy - Q
+					end
+				end
+			elseif Torus.reachedDestination(baseX, baseY) == false then
+				Moving = true
+				Torus.move(baseX, baseY, G, color)
+				energy = energy - Q 
+			else
+				-- do nothing
+			end
 		elseif baseX == nil and baseY == nil then
 			if M == 0 then
 				if scanForBase == true then

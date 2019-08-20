@@ -48,6 +48,7 @@ function initializeAgent()
 
 	doScan = false
 	base = false -- not at base (for now)
+	timeIsUp = false
 
 	gotoX = PositionX -- Starts in reachedDestination and gets a new one
 	gotoY = PositionY -- Starts in reachedDestination and gets a new one
@@ -59,7 +60,9 @@ function initializeAgent()
 end
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-	
+	if eventDescription == "timesUp" then
+		timeIsUp = true
+	end
 end
 
 
@@ -71,6 +74,15 @@ function takeStep()
 			say("AGENT DIED!")
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
 			Agent.removeAgent(ID)
+		elseif timeIsUp == true then
+			--say("time is up")
+			if Torus.reachedDestination(baseX, baseY) == false then
+				Moving = true
+				Torus.move(baseX, baseY, G, color)
+				energy = energy - Q 
+			else
+				-- do nothing
+			end
 
 		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
 			--charge
