@@ -45,6 +45,7 @@ function initializeAgent()
 	G = Shared.getNumber(3)
 	P = Shared.getNumber(4)
 	Q = Shared.getNumber(5)
+	S = Shared.getNumber(6)
 
 	doScan = false
 	base = false -- not at base (for now)
@@ -87,7 +88,6 @@ function takeStep()
 				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
 				Agent.removeAgent(ID) -- remove to make space for others
 			end
-
 		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
 			--charge
 			energy = FULL_ENERGY
@@ -98,28 +98,27 @@ function takeStep()
 			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 			energy = energy - Q 
 		elseif ores then
+			--TODO: Add memory to store values and transmit to transporter, if value already is present, dont add
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = {oreX=ores[1]["posX"], oreY=ores[1]["posY"]}}
-			--say("Explorer: " .. "ORE AT:" .. ores[1]["posX"] .. " " .. ores[1]["posY"] )
-			--say("Explorer: " .. "EXPLORER AT:" .. PositionX .. " " .. PositionY )
 			energy = energy - 1	
 			ores = nil
-
-		elseif doScan == false then
-			-- random Movement
-			if Torus.reachedDestination(gotoX, gotoY) == true then
-				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
-				gotoY = Stat.randomInteger(0, ENV_WIDTH)
-				doScan = true 
-			else
-				Moving = true
-				Torus.move(gotoX, gotoY, G, color)
-				--say("movement: "..Q * Torus.distance(gotoX, gotoY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
-				energy = energy - Q
-			end
 		elseif doScan == true then
 			ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
 			energy = energy - P
 			doScan = false
+		else --RANDOM MOVEMENT
+			if Torus.reachedDestination(gotoX, gotoY) == true then
+				doScan = true
+				local randSteps = Stat.randomInteger(0, ENV_HEIGHT/5) -- 1/5 because of perception range
+				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) < randSteps do
+					gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+					gotoY = Stat.randomInteger(0, ENV_WIDTH)
+				end
+			else
+				Moving = true
+				Torus.move(gotoX, gotoY, G, color)
+				energy = energy - Q
+			end
 		end
 	end
 end
