@@ -80,15 +80,10 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		end
 
 		if eventDescription == "oreStored" then
-			say("T: I received event: orestored")
-			say("T: I got " .. eventTable["oresReturned"] .. " ores back")	
-			say("T: ID received: " .. eventTable["destinationID"] .." my ID: " .. ID) 
 			if eventTable["destinationID"] == ID then
 				unloadingOreSend = false
-				oreStored = eventTable["oresReturned"]
-				say("T: I got " .. oreStored .. " ores back")	
+				oreStored = eventTable["oresReturned"]	
 				if oreStored ~= 0 then
-					say("I need a new base..")
 					--FIND NEW BASE	
 					baseX = nil
 					baseY = nil
@@ -107,9 +102,7 @@ function takeStep()
 			Agent.removeAgent(ID)
 		elseif baseX == nil and baseY == nil then
 			if M == 0 then
-				--say("fuck dude, I need a base")
 				if scanForBase == true then
-					--say("scanning for a base")
 					base = Torus.squareSpiralTorusScanColor(P,{0,0,255}, G)
 					scanForBase = false
 					energy = energy - P
@@ -120,7 +113,6 @@ function takeStep()
 					end
 				else
 					if Torus.reachedDestination(gotoX, gotoY) == true then
-						--say("I made a moving for a new base")
 						gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 						gotoY = Stat.randomInteger(0, ENV_WIDTH)
 						scanForBase = true

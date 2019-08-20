@@ -106,12 +106,12 @@ function torus.move(x,y, G, color)
 	if math.abs(directionY) > G/2 	then directionY = -directionY end
 	
 	-- Determining destination point
-	if	directionX > 0.1 then destX = PositionX+1
-	elseif	directionX < -0.1 then destX = PositionX-1
+	if	directionX > 0.3 then destX = PositionX+1
+	elseif	directionX < -0.3 then destX = PositionX-1
 	else	destX = PositionX	end
 	
-	if	directionY > 0.1 then destY = PositionY+1
-	elseif	directionY < -0.1 then destY = PositionY-1
+	if	directionY > 0.3 then destY = PositionY+1
+	elseif	directionY < -0.3 then destY = PositionY-1
 	else	destY = PositionY	end
 	
 	-- Determining destination point if direction is through the edge of the map
@@ -136,7 +136,7 @@ function torus.move(x,y, G, color)
 		-- If destination is on the same y
 		if destX ~= PositionX and destY == PositionY then
 			-- Change y with either -1 or 1
-			local randStep = torus.randomWithStep(-1,1,2)
+			local randStep = torus.randomWithStep(-1,1,1)
 			destY = PositionY+randStep
 
 			-- If still collision
@@ -155,7 +155,7 @@ function torus.move(x,y, G, color)
 		-- If destination is on the same x
 		elseif destY ~= PositionY and destX == PositionX then
 			-- Change x with either -1 or 1
-			local randStep = torus.randomWithStep(-1,1,2)
+			local randStep = torus.randomWithStep(-1,1,1)
 			destX = PositionX+randStep
 			
 			-- If still collision
@@ -239,11 +239,11 @@ end
 
 function torus.reachedDestination(gotoX, gotoY)
 	result = false
-	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
+	if math.abs(PositionX - gotoX) < 2 and math.abs(PositionY - gotoY) < 2 then
 		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
 		result = true
 	end
-	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
+	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 and math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
 		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
 		result = true
 	end

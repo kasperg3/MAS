@@ -26,18 +26,20 @@ Stat = require "ranalib_statistic"
 Map = require "ranalib_map"
 function initializeAgent()
 
-	Agent.changeColor{b=255}
+	Agent.changeColor{b=100, r=100, g=100}
+	PositionX = ENV_WIDTH + 10
+	PositionY = ENV_HEIGHT + 10
 	
 	-- PARAMETERS from exercise	
 	O = 3-- ores
 	X = 5 -- explorer
-	Y = 1 -- transporters
+	Y = 5-- transporters
 	G = ENV_WIDTH -- grid
 	N = 1 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
 	D = 0 -- density
 	I = G/5-1 -- communication scope
-	P = 150 -- perception scope
+	P = 50 -- perception scope
 	W = 1 -- limited capacity of robots
 	C = 2 -- capacity of base
 	E = 100000 -- energy
@@ -82,9 +84,8 @@ function initializeAgent()
 			Agent.addAgent("transporter.lua", x, y)
 		end
 	end
-
-
-
-	-- Remove master agent from the map
-	Agent.removeAgent(ID)
+	local x = os.clock()
+    local s = 0
+    for i=1,10000 do s = s + i end
+    print(string.format("elapsed time: %.2f\n", os.clock() - x))
 end

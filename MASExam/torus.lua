@@ -239,11 +239,11 @@ end
 
 function torus.reachedDestination(gotoX, gotoY)
 	result = false
-	if math.abs(PositionX - gotoX) < 2 or math.abs(PositionY - gotoY) < 2 then
+	if math.abs(PositionX - gotoX) < 2 and math.abs(PositionY - gotoY) < 2 then
 		--say("1-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
 		result = true
 	end
-	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 or math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
+	if math.abs(PositionX - gotoX - ENV_WIDTH) < 2 and math.abs(PositionY - gotoY - ENV_HEIGHT) < 2 then
 		--say("2-posX:"..PositionX.." posY:"..PositionY.." gotoX:"..gotoX.." gotoY:"..gotoY)
 		result = true
 	end
