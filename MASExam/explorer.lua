@@ -34,6 +34,7 @@ Torus = require "torus"
 local FIFO = require "fifo"
 local memory = FIFO():setempty(function() return nil end)
 
+local transporterID = nil
 
 function initializeAgent()
 
@@ -50,6 +51,8 @@ function initializeAgent()
 	P = Shared.getNumber(4)
 	Q = Shared.getNumber(5)
 	S = Shared.getNumber(6)
+	W = Shared.getNumber(7)
+	I = Shared.getNumber(8)
 	O = Shared.getNumber(10)
 	doScan = false
 	base = false -- not at base (for now)
@@ -71,6 +74,14 @@ end
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	if eventDescription == "timesUp" then
 		timeIsUp = true
+	end
+	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
+		if eventDescription == "transporterAcknowledge" and listenToAck == true then
+			say("E: Agent #: " .. ID .. " Recieved ACK from Agent #: " .. eventTable["transporterID"])
+			transporterAckRecieved = true
+			transporterID = eventTable["transporterID"]
+			listenToAck = false
+		end
 	end
 end
 
@@ -107,19 +118,26 @@ function takeStep()
 			energy = energy - Q 
 		elseif transporterRequest == true then
 			--Emit a event with a availability request 
-			
+			say("E: Agent #: " .. ID .. "Sending Availability request")
+			transporterRequest = false
+			listenToAck = true
+			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="availabilityRequest"}
+			energy = energy - 1
 		elseif transporterAckRecieved == true then
-			--Send acknowledgement and attatch coordinates for 
-
-		elseif memoryToTransmit == true then
+			--Send acknowledgement and attatch coordinates and id of the transporter
 			local memTable = {}
 			for i = 1, memory:length() do 
 				oreCoord = memory:peek(i)
 				memTable[i] = {oreX=oreCoord[1], oreY=oreCoord[2]}
 			end
-			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = memTable}
+			memTable[#memTable] = {ackID=transporterID} -- Attach the ID of the ack transporter
+			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="explorerAck", table = memTable}
 			energy = energy - 1
-			memoryToTransmit = false
+			transporterAckRecieved = false
+			for j = 1, memory:length() do
+				memory:pop()
+			end
+
 		elseif doScan == true then
 			ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
 			energy = energy - P
@@ -136,13 +154,12 @@ function takeStep()
 				end
 				ores = nil
 			end
-
 		else --RANDOM MOVEMENT
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				doScan = true
 
 				if memory:peek() ~= nil then 
-					memoryToTransmit = true
+					transporterRequest = true
 				end
 
 				local randSteps = Stat.randomInteger(0, P) -- P because of perception range

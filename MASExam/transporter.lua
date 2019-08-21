@@ -34,6 +34,9 @@ Torus = require "torus"
 local FIFO = require "fifo"
 local memory = FIFO():setempty(function() return nil end)
 
+local respondAck = false
+local explorerID = nil
+
 function initializeAgent()
 
 	GridMovement = true	-- Visible is the collision grid
@@ -82,20 +85,23 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		timeIsUp = true
 	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
-		if eventDescription == "oreDetected" then 
-			for j = 1, #eventTable do 
-				for i = 1, memory:length() do 
-					if memory:peek(i)["oreX"] == eventTable[j]["oreX"] and memory:peek(i)["oreY"] == eventTable[j]["oreY"] then
-						memory:remove(i)
-					end
-				end
+		
+		if eventDescription == "availabilityRequest" then
+			if memory:peek(1) == nil then 
+				respondAck = true
+				explorerID = sourceID
 			end
-			for j = 1, #eventTable do 
+		end
+
+		if eventDescription == "explorerAck"  and eventTable[#eventTable]["ackID"] == ID then
+			table.remove(eventTable, #eventTable)
+			say("T: Agent #: " .. ID .. "Recieved ACK from Agent: " .. sourceID)
+			for k = 1, #eventTable do 
 				if memory:length() < S then 
-					memory:push({eventTable[j]["oreX"],eventTable[j]["oreY"]})
+					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
 				else
 					memory:pop()
-					memory:push({eventTable[j]["oreX"],eventTable[j]["oreY"]})
+					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
 				end
 				if memory:length() ~= nil then
 					oreLocated = true
@@ -113,12 +119,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 				end
 			end
 		end
-
 	end
-
-
-
-
 end
 
 function findBase()
@@ -184,6 +185,11 @@ function takeStep()
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
 			energy = energy - Q
+
+		elseif respondAck == true then 
+			say("T: Agent #: " .. ID .. " Respond to ACK form Agent #: " .. explorerID)
+			Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="transporterAcknowledge", table={transporterID = ID}}
+			respondAck = false
 		elseif oreLocated == true then 						-- If Ore located 
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
 				--if Torus.compareTables(Map.checkColor(memory:peek()[1],memory:peek()[2]), {255,255,255}) then 
