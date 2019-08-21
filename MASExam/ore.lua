@@ -41,11 +41,10 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
-
-
 	if eventDescription == "oreDepleted" and eventTable["oreX"] == PositionX and eventTable["oreY"] == PositionY then
-		--say("ORE:" .. "source" .. eventTable["oreX"] .. " " .. eventTable["oreY"] .. " Position: " .. PositionX .. " " .. PositionY)
 		Map.modifyColor(PositionX,PositionY,{0,0,0})	
+		Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreDepletedACK", table={transporterID = sourceID}}
+		say("ORE: sending ACK to ID#: " .. sourceID )
 		Agent.removeAgent(ID)
 	end
 end

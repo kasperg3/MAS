@@ -32,7 +32,7 @@ Torus = require "torus"
 
 --FIFO 
 FIFO = require "fifo"
-memory = FIFO():setempty(function() return nil end)
+local memory = FIFO():setempty(function() return nil end)
 
 function initializeAgent()
 
@@ -70,12 +70,19 @@ end
 
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
+
+	if eventDescription == "oreDepletedACK" then
+		--say("Agent #: " .. ID .. "recieved ACK with ID#:" .. eventTable["transporterID"])
+		if eventTable["transporterID"] == ID then
+			oreStored = oreStored + 1
+		end
+	end
+
 	if eventDescription == "timesUp" then
 		timeIsUp = true
 	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
-		if eventDescription == "oreDetected" and oreLocated == false then 
-			oreLocated = true
+		if eventDescription == "oreDetected" then 
 			for i = 1, memory:length() do 
 				if memory:peek(i)["oreX"] == eventTable["oreX"] and memory:peek(i)["oreY"] == eventTable["oreY"] then
 					memory:remove(i)
@@ -87,8 +94,10 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 				memory:pop()
 				memory:push({eventTable["oreX"],eventTable["oreY"]})
 			end
+			if memory:length() ~= nil then
+				oreLocated = true
+			end
 		end
-
 		if eventDescription == "oreStored" then
 			if eventTable["destinationID"] == ID then
 				unloadingOreSend = false
@@ -100,7 +109,12 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 				end
 			end
 		end
+
 	end
+
+
+
+
 end
 
 function findBase()
@@ -138,11 +152,11 @@ function takeStep()
 			if baseX == nil and baseY == nil then -- Find base
 				findBase()
 			elseif Torus.reachedDestination(baseX, baseY) == false then
-				--say("moving towards base")
 				Moving = true
 				Torus.move(baseX, baseY, G, color)
 				energy = energy - Q 
-			else
+			else -- Unload ores before deleting the agent
+				Event.emit{sourceX = PostionX, sourceY = PositionY, sourceID = ID, speed=1000000, description="unloadingOre", table={ores=oreStored}}
 				Collision.updatePosition(-1,-1)
 				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
 				Agent.removeAgent(ID) -- remove to make space for others
@@ -155,6 +169,7 @@ function takeStep()
 			energy = FULL_ENERGY
 			if unloadingOreSend == false and oreStored ~= 0 then --If in base to charge, unload ores if carrying any
 				Event.emit{sourceX = PostionX, sourceY = PositionY, sourceID = ID, speed=1000000, description="unloadingOre", table={ores=oreStored}}
+				say("Agent #: ".. ID .. " Unloading ores " .. oreStored )
 				unloadingOreSend = true
 			end
 		elseif energy < LOW_ENERGY then 					-- If low energy return to base
@@ -167,11 +182,11 @@ function takeStep()
 			energy = energy - Q
 		elseif oreLocated == true then 						-- If Ore located 
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
-				oreLocated = false
+				--if Torus.compareTables(Map.checkColor(memory:peek()[1],memory:peek()[2]), {255,255,255}) then 
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreDepleted", table={oreX = memory:peek()[1], oreY = memory:peek()[2]}}
 				memory:pop() --Remove ore from memory
 				energy = energy - 1
-				oreStored = oreStored + 1
+				if memory:length() == 0 then oreLocated = false end
 			else
 				Moving = true
 				Torus.move(memory:peek()[1], memory:peek()[2], G, color)
