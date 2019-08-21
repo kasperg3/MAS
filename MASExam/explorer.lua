@@ -50,11 +50,14 @@ function initializeAgent()
 	P = Shared.getNumber(4)
 	Q = Shared.getNumber(5)
 	S = Shared.getNumber(6)
-
+	O = Shared.getNumber(10)
 	doScan = false
 	base = false -- not at base (for now)
 	timeIsUp = false
 	memoryToTransmit = false
+	transporterAckRecieved = false
+
+	transporterRequest = false
 
 	gotoX = PositionX -- Starts in reachedDestination and gets a new one
 	gotoY = PositionY -- Starts in reachedDestination and gets a new one
@@ -102,15 +105,19 @@ function takeStep()
 			Torus.move(baseX, baseY, G, color)
 			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 			energy = energy - Q 
-		elseif memoryToTransmit == true then
+		elseif transporterRequest == true then
+			--Emit a event with a availability request 
+			
+		elseif transporterAckRecieved == true then
+			--Send acknowledgement and attatch coordinates for 
 
+		elseif memoryToTransmit == true then
 			local memTable = {}
 			for i = 1, memory:length() do 
 				oreCoord = memory:peek(i)
 				memTable[i] = {oreX=oreCoord[1], oreY=oreCoord[2]}
 			end
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = memTable}
-		
 			energy = energy - 1
 			memoryToTransmit = false
 		elseif doScan == true then

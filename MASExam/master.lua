@@ -38,7 +38,7 @@ function initializeAgent()
 	-- PARAMETERS from exercise	
 	D = 100-- ores
 	X = 1 -- explorer
-	Y = 5-- transporters
+	Y = 1-- transporters
 	G = ENV_WIDTH -- grid
 	N = 3 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
@@ -51,6 +51,7 @@ function initializeAgent()
 	T = 99 -- time t to return to the base [SEC]
 	S = X + Y - 1 -- memory of robots/bases 
 	Q = 1 -- Cost of motion
+	O = 2 -- OreTasks to send to the transporters
 
 	-- Own PARAMETERS
 	LOW_ENERGY = 50
@@ -68,6 +69,7 @@ function initializeAgent()
 	Shared.storeNumber(7, W, true)
 	Shared.storeNumber(8, I,true)
 	Shared.storeNumber(9, M, true)
+	Shared.storeNumber(10, O, true)
 
 
 	-- initializAgents
