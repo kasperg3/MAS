@@ -130,10 +130,11 @@ function takeStep()
 				oreCoord = memory:peek(i)
 				memTable[i] = {oreX=oreCoord[1], oreY=oreCoord[2]}
 			end
-			memTable[#memTable] = {ackID=transporterID} -- Attach the ID of the ack transporter
+			memTable[#memTable+1] = {ackID = transporterID} -- Attach the ID of the ack transporter
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="explorerAck", table = memTable}
 			energy = energy - 1
 			transporterAckRecieved = false
+
 			for j = 1, memory:length() do
 				memory:pop()
 			end

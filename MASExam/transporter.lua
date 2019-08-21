@@ -94,20 +94,18 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		end
 
 		if eventDescription == "explorerAck"  and eventTable[#eventTable]["ackID"] == ID then
-			table.remove(eventTable, #eventTable)
-			say("T: Agent #: " .. ID .. "Recieved ACK from Agent: " .. sourceID)
-			for k = 1, #eventTable do 
+			say("T: Agent #: " .. ID .. " Recieved ACK from Agent: " .. sourceID)
+			for k = 1, #eventTable-1 do 
 				if memory:length() < S then 
 					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
 				else
 					memory:pop()
 					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
 				end
-				if memory:length() ~= nil then
-					oreLocated = true
-				end
 			end
+			oreLocated = true	
 		end
+
 		if eventDescription == "oreStored" then
 			if eventTable["destinationID"] == ID then
 				unloadingOreSend = false
@@ -204,7 +202,7 @@ function takeStep()
 			end
 		else -- random Movement
 			if Torus.reachedDestination(gotoX, gotoY) == true then
-				local randSteps = Stat.randomInteger(0, ENV_HEIGHT/2)
+				local randSteps = Stat.randomInteger(0, P)
 				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) < randSteps do
 					gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 					gotoY = Stat.randomInteger(0, ENV_WIDTH)
