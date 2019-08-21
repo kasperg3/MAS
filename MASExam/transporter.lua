@@ -31,7 +31,7 @@ Shared = require "ranalib_shared"
 Torus = require "torus"
 
 --FIFO 
-FIFO = require "fifo"
+local FIFO = require "fifo"
 local memory = FIFO():setempty(function() return nil end)
 
 function initializeAgent()
@@ -83,19 +83,23 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
 		if eventDescription == "oreDetected" then 
-			for i = 1, memory:length() do 
-				if memory:peek(i)["oreX"] == eventTable["oreX"] and memory:peek(i)["oreY"] == eventTable["oreY"] then
-					memory:remove(i)
+			for j = 1, #eventTable do 
+				for i = 1, memory:length() do 
+					if memory:peek(i)["oreX"] == eventTable[j]["oreX"] and memory:peek(i)["oreY"] == eventTable[j]["oreY"] then
+						memory:remove(i)
+					end
 				end
 			end
-			if memory:length() < S then 
-				memory:push({eventTable["oreX"],eventTable["oreY"]})
-			else
-				memory:pop()
-				memory:push({eventTable["oreX"],eventTable["oreY"]})
-			end
-			if memory:length() ~= nil then
-				oreLocated = true
+			for j = 1, #eventTable do 
+				if memory:length() < S then 
+					memory:push({eventTable[j]["oreX"],eventTable[j]["oreY"]})
+				else
+					memory:pop()
+					memory:push({eventTable[j]["oreX"],eventTable[j]["oreY"]})
+				end
+				if memory:length() ~= nil then
+					oreLocated = true
+				end
 			end
 		end
 		if eventDescription == "oreStored" then
@@ -169,7 +173,7 @@ function takeStep()
 			energy = FULL_ENERGY
 			if unloadingOreSend == false and oreStored ~= 0 then --If in base to charge, unload ores if carrying any
 				Event.emit{sourceX = PostionX, sourceY = PositionY, sourceID = ID, speed=1000000, description="unloadingOre", table={ores=oreStored}}
-				say("Agent #: ".. ID .. " Unloading ores " .. oreStored )
+				--say("Agent #: ".. ID .. " Unloading ores " .. oreStored )
 				unloadingOreSend = true
 			end
 		elseif energy < LOW_ENERGY then 					-- If low energy return to base

@@ -30,6 +30,10 @@ Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 Torus = require "torus"
 
+--FIFO 
+local FIFO = require "fifo"
+local memory = FIFO():setempty(function() return nil end)
+
 
 function initializeAgent()
 
@@ -50,6 +54,7 @@ function initializeAgent()
 	doScan = false
 	base = false -- not at base (for now)
 	timeIsUp = false
+	memoryToTransmit = false
 
 	gotoX = PositionX -- Starts in reachedDestination and gets a new one
 	gotoY = PositionY -- Starts in reachedDestination and gets a new one
@@ -97,19 +102,43 @@ function takeStep()
 			Torus.move(baseX, baseY, G, color)
 			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 			energy = energy - Q 
-		elseif ores then
-			--TODO: Add memory to store values and transmit to transporter, if value already is present, dont add
-			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = {oreX=ores[1]["posX"], oreY=ores[1]["posY"]}}
-			energy = energy - 1	
-			ores = nil
+		elseif memoryToTransmit == true then
+
+			local memTable = {}
+			for i = 1, memory:length() do 
+				oreCoord = memory:peek(i)
+				memTable[i] = {oreX=oreCoord[1], oreY=oreCoord[2]}
+			end
+			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="oreDetected", table = memTable}
+		
+			energy = energy - 1
+			memoryToTransmit = false
 		elseif doScan == true then
 			ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
 			energy = energy - P
 			doScan = false
+			--Save to memory
+			if ores then 
+				for i = 1, #ores do 
+					if memory:length() < S then 
+						memory:push({ores[i]["posX"], ores[i]["posY"]})
+					elseif memory:length() == S then
+						memory:pop()
+						memory:push({ores[i]["posX"], ores[i]["posY"]})	
+					end
+				end
+				ores = nil
+			end
+
 		else --RANDOM MOVEMENT
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				doScan = true
-				local randSteps = Stat.randomInteger(0, ENV_HEIGHT/5) -- 1/5 because of perception range
+
+				if memory:peek() ~= nil then 
+					memoryToTransmit = true
+				end
+
+				local randSteps = Stat.randomInteger(0, P) -- P because of perception range
 				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) < randSteps do
 					gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 					gotoY = Stat.randomInteger(0, ENV_WIDTH)
@@ -119,6 +148,7 @@ function takeStep()
 				Torus.move(gotoX, gotoY, G, color)
 				energy = energy - Q
 			end
+
 		end
 	end
 end

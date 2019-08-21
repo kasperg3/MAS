@@ -37,18 +37,18 @@ function initializeAgent()
 	
 	-- PARAMETERS from exercise	
 	D = 100-- ores
-	X = 5 -- explorer
+	X = 1 -- explorer
 	Y = 5-- transporters
 	G = ENV_WIDTH -- grid
 	N = 3 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
 	I = G/5-1 -- communication scope
-	P = 50 -- perception scope
+	P = G/20-1 -- perception scope
 	W = 10 -- limited capacity of robots
 	C = 100 -- capacity of base
 	E = 500 -- energy
 	Q = 0 -- cost of sending message
-	T = 1 -- time t to return to the base [SEC]
+	T = 99 -- time t to return to the base [SEC]
 	S = X + Y - 1 -- memory of robots/bases 
 	Q = 1 -- Cost of motion
 
@@ -78,8 +78,8 @@ function initializeAgent()
 	--Agent.addAgent("base.lua", x, y) -- empty base NO explorers or transporters -- used for test
 	
 	for i=0, (N - 1) do -- For each base, initialize X + Y with certain x, y
-		x = Stat.randomInteger(0, ENV_HEIGHT)
-		y = Stat.randomInteger(0, ENV_WIDTH)
+		x = Stat.randomInteger(1, ENV_HEIGHT-1)
+		y = Stat.randomInteger(1, ENV_WIDTH-1)
 
 		Agent.addAgent("base.lua", x, y)
 		for i=0, (X - 1) do
