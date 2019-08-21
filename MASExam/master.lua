@@ -37,10 +37,10 @@ function initializeAgent()
 	
 	-- PARAMETERS from exercise	
 	D = 100-- ores
-	X = 5 -- explorer
-	Y = 5-- transporters
+	X = 10 -- explorer
+	Y = 10-- transporters
 	G = ENV_WIDTH -- grid
-	N = 1 -- bases
+	N = 20 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
 	I = G/5-1 -- communication scope
 	P = G/20-1 -- perception scope

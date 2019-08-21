@@ -94,7 +94,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		end
 
 		if eventDescription == "explorerAck"  and eventTable[#eventTable]["ackID"] == ID then
-			say("T: Agent #: " .. ID .. " Recieved ACK from Agent: " .. sourceID)
+			--say("T: Agent #: " .. ID .. " Recieved ACK from Agent: " .. sourceID)
 			for k = 1, #eventTable-1 do 
 				if memory:length() < S then 
 					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
@@ -185,7 +185,7 @@ function takeStep()
 			energy = energy - Q
 
 		elseif respondAck == true then 
-			say("T: Agent #: " .. ID .. " Respond to ACK form Agent #: " .. explorerID)
+			--say("T: Agent #: " .. ID .. " Respond to ACK form Agent #: " .. explorerID)
 			Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="transporterAcknowledge", table={transporterID = ID}}
 			respondAck = false
 		elseif oreLocated == true then 						-- If Ore located 

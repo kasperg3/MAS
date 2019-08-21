@@ -77,7 +77,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
 		if eventDescription == "transporterAcknowledge" and listenToAck == true then
-			say("E: Agent #: " .. ID .. " Recieved ACK from Agent #: " .. eventTable["transporterID"])
+			--say("E: Agent #: " .. ID .. " Recieved ACK from Agent #: " .. eventTable["transporterID"])
 			transporterAckRecieved = true
 			transporterID = eventTable["transporterID"]
 			listenToAck = false
@@ -118,7 +118,7 @@ function takeStep()
 			energy = energy - Q 
 		elseif transporterRequest == true then
 			--Emit a event with a availability request 
-			say("E: Agent #: " .. ID .. "Sending Availability request")
+			--say("E: Agent #: " .. ID .. "Sending Availability request")
 			transporterRequest = false
 			listenToAck = true
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="availabilityRequest"}
