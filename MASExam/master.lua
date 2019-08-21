@@ -120,7 +120,7 @@ function takeStep()
 	if (Core.time() - startTime) > T+1.2 and printResults == false then
 		say("-- RESULTS --")
 		say("Alive robots: " .. X+Y-deadAgents .. " out of " .. X+Y .. " | percentage: " .. ((X+Y-deadAgents)/(X+Y))*100)
-		say("Ores collected: " ..  totalOres .. " out of " .. D .. " | percentage: ")
+		say("Ores collected: " ..  totalOres .. " out of " .. D .. " | percentage: " .. (totalOres/D*100))
 		say("Time spent: " .. T)
 		printResults = true
 	end
