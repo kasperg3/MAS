@@ -36,6 +36,13 @@ function initializeAgent()
 	GridMovement = true	-- Visible is the collision grid
 	--say("Agent #: " .. ID .. " has been initialized")
 	Agent.changeColor{r=255, g=255, b=255}	
+	if PositionX == ENV_WIDTH then
+		PositionX = PositionX - 1
+	elseif PositionX == 0 then 
+		PositionX = PositionX + 1
+	end
+	if PositionY == ENV_WIDTH then PositionY = PositionY - 1
+	elseif PositionY == 0 then PositionY = PositionY + 1 end
 end
 
 
