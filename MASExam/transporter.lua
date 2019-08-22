@@ -29,6 +29,7 @@ Stat = require "ranalib_statistic"
 Agent = require "ranalib_agent"
 Shared = require "ranalib_shared"
 Torus = require "torus"
+Core = require "ranalib_core"
 
 --FIFO 
 local FIFO = require "fifo"
@@ -160,7 +161,9 @@ function findBase()
 end
 
 function takeStep()
+	--say(Core.time())
 	local LOW_ENERGY = ENV_HEIGHT * 0.7
+	if memory:length() == 0 then oreLocated = false end
 	if Moving == false then
 		if energy < 0 then
 			say("AGENT DIED!")
@@ -206,12 +209,12 @@ function takeStep()
 			Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="transporterAcknowledge", table={transporterID = ID, targetGroup = groupID}}
 			respondAck = false
 		elseif oreLocated == true then 						-- If Ore located 
+			if memory:length() == 0 then say("RIP") end
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
 				--if Torus.compareTables(Map.checkColor(memory:peek()[1],memory:peek()[2]), {255,255,255}) then 
 				Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="oreDepleted", table={oreX = memory:peek()[1], oreY = memory:peek()[2]}}
 				memory:pop() --Remove ore from memory
 				energy = energy - 1
-				if memory:length() == 0 then oreLocated = false end
 			else
 				Moving = true
 				Torus.move(memory:peek()[1], memory:peek()[2], G, color)

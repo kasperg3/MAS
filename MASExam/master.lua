@@ -36,18 +36,18 @@ function initializeAgent()
 	getOres = false
 	
 	-- PARAMETERS from exercise	
-	D = 100-- ores
-	X = 1 -- explorer
-	Y = 1-- transporters
+	D = 250-- ores
+	X = 40 -- explorer
+	Y = 10-- transporters
 	G = ENV_WIDTH -- grid
-	N = 30 -- bases
+	N = 1 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
 	I = G/5-1 -- communication scope
 	P = G/20-1 -- perception scope
-	W = 10 -- limited capacity of robots
-	C = 100 -- capacity of base
+	W = 5 -- limited capacity of robots
+	C = 1000 -- capacity of base
 	E = 1000 -- energy
-	Q = 0 -- cost of sending message
+	--Q = 0 -- cost of sending message
 	T = 2 -- time t to return to the base [SEC]
 	S = X + Y - 1 -- memory of robots/bases
 	Q = 1 -- Cost of motion
@@ -77,10 +77,7 @@ function initializeAgent()
 		Agent.addAgent("ore.lua")
 	end
 
-	--Agent.addAgent("base.lua", x, y) -- empty base NO explorers or transporters -- used for test
-
-	spawnBase(0, 10, 1)
-	spawnBase(10, 0, 1)
+	spawnBase(X, Y, N)
 
 	startTime = Core.time()
 end
@@ -127,8 +124,32 @@ function takeStep()
 	if (Core.time() - startTime) > T+1.2 and printResults == false then
 		say("-- RESULTS --")
 		say("Alive robots: " .. X+Y-deadAgents .. " out of " .. X+Y .. " | percentage: " .. ((X+Y-deadAgents)/(X+Y))*100)
-		say("Ores collected: " ..  totalOres .. " out of " .. D .. " | percentage: " .. (totalOres/D*100))
+		say("Ores collected: " ..  totalOres .. " out of " .. D .. " | percentage: " .. ((totalOres/D)*100))
 		say("Time spent: " .. T)
+
+
 		printResults = true
+		l_stopSimulation()
 	end
 end
+
+function cleanUp()
+	--say("tring to write..")
+	deadRobots = ((X+Y-deadAgents)/(X+Y))*100
+	oresCollected = ((totalOres/D)*100)
+	file = io.open("/home/walsted/workspace/RANA/MAS/MASExam/test.dat", "a")
+	file:write(deadRobots .. "\n")
+	file:write(oresCollected .. "\n")
+	file:close()
+
+	--file = io.open("/home/walsted/workspace/RANA/MAS/MASExam/test")
+	--say(file:read())
+	--say("Trying to read after write")
+
+	
+
+
+
+end
+
+
