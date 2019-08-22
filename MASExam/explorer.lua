@@ -158,13 +158,13 @@ function takeStep()
 		else --RANDOM MOVEMENT
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				doScan = true
-
+				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+				gotoY = Stat.randomInteger(0, ENV_WIDTH)
 				if memory:peek() ~= nil then 
 					transporterRequest = true
 				end
-
-				local randSteps = Stat.randomInteger(0, P) -- P because of perception range
-				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) < randSteps do
+				local randSteps = Stat.randomInteger(1, I) -- P because of perception range
+				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) > randSteps do
 					gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 					gotoY = Stat.randomInteger(0, ENV_WIDTH)
 				end

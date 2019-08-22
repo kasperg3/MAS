@@ -202,8 +202,10 @@ function takeStep()
 			end
 		else -- random Movement
 			if Torus.reachedDestination(gotoX, gotoY) == true then
-				local randSteps = Stat.randomInteger(0, P)
-				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) < randSteps do
+				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
+				gotoY = Stat.randomInteger(0, ENV_WIDTH)
+				local randSteps = Stat.randomInteger(0, I)
+				while Torus.distance(PositionX,PositionY,gotoX,gotoY,ENV_WIDTH,ENV_HEIGHT) > randSteps do
 					gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 					gotoY = Stat.randomInteger(0, ENV_WIDTH)
 				end
