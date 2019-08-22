@@ -44,6 +44,8 @@ function initializeAgent()
 	Agent.changeColor{g=255}	
 	color = {0, 255, 0}	
 
+	groupID = tostring(PositionX) .. tostring(PositionY)
+
 	-- parameters
 	energy = Shared.getNumber(1) -- current energy
 	FULL_ENERGY = Shared.getNumber(1)
@@ -55,6 +57,7 @@ function initializeAgent()
 	W = Shared.getNumber(7)
 	I = Shared.getNumber(8)
 	M = Shared.getNumber(9)
+
 	oreStored = 0
 	oreLocated = false
 	doScan = false
@@ -85,27 +88,41 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		timeIsUp = true
 	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
-		
+		--say("des: " .. eventDescription)
+		senderID = nil
 		if eventDescription == "availabilityRequest" then
-			if memory:peek(1) == nil then 
-				respondAck = true
-				explorerID = sourceID
-			end
+			senderID = eventTable["targetGroup"]
+			--say("T: tg" .. senderID .. " my ID " .. groupID)
 		end
-
-		if eventDescription == "explorerAck"  and eventTable[#eventTable]["ackID"] == ID then
-			--say("T: Agent #: " .. ID .. " Recieved ACK from Agent: " .. sourceID)
-			for k = 1, #eventTable-1 do 
-				if memory:length() < S then 
-					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
-				else
-					memory:pop()
-					memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
+		if eventDescription == "explorerAck" then
+			senderID = eventTable[#eventTable]["targetGroup"]
+			--say("T: tg" .. senderID .. " my ID " .. groupID)	
+		end
+		--say("M: " .. M)
+		if M == 0 or senderID == groupID then -- only do this if same targetID or M == 0 (working together)
+			--say("T: agree")
+			if eventDescription == "availabilityRequest" then
+				if memory:peek(1) == nil then 
+					respondAck = true
+					explorerID = sourceID
 				end
 			end
-			oreLocated = true	
-		end
 
+			if eventDescription == "explorerAck"  and eventTable[#eventTable-1]["ackID"] == ID then -- -1 because the last element is targetID
+				--say("T: Agent #: " .. ID .. " Recieved ACK from Agent: " .. sourceID)
+				for k = 1, #eventTable-2 do -- -2 because there is ackID and targetID
+					if memory:length() < S then 
+						memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
+					else
+						memory:pop()
+						memory:push({eventTable[k]["oreX"],eventTable[k]["oreY"]})
+					end
+				end
+				oreLocated = true	
+			end
+		else
+			--say("T: denied")
+		end
 		if eventDescription == "oreStored" then
 			if eventTable["destinationID"] == ID then
 				unloadingOreSend = false
@@ -186,7 +203,7 @@ function takeStep()
 
 		elseif respondAck == true then 
 			--say("T: Agent #: " .. ID .. " Respond to ACK form Agent #: " .. explorerID)
-			Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="transporterAcknowledge", table={transporterID = ID}}
+			Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="transporterAcknowledge", table={transporterID = ID, targetGroup = groupID}}
 			respondAck = false
 		elseif oreLocated == true then 						-- If Ore located 
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then

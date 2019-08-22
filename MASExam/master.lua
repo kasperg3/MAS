@@ -36,11 +36,11 @@ function initializeAgent()
 	getOres = false
 	
 	-- PARAMETERS from exercise	
-	D = 1000-- ores
-	X = 5 -- explorer
-	Y = 5-- transporters
+	D = 100-- ores
+	X = 1 -- explorer
+	Y = 1-- transporters
 	G = ENV_WIDTH -- grid
-	N = 1 -- bases
+	N = 30 -- bases
 	M = 0 -- cooperative mode -- 0 = true, 1 = false 
 	I = G/5-1 -- communication scope
 	P = G/20-1 -- perception scope
@@ -48,8 +48,8 @@ function initializeAgent()
 	C = 100 -- capacity of base
 	E = 1000 -- energy
 	Q = 0 -- cost of sending message
-	T = 99 -- time t to return to the base [SEC]
-	S = X + Y - 1 -- memory of robots/bases 
+	T = 2 -- time t to return to the base [SEC]
+	S = X + Y - 1 -- memory of robots/bases
 	Q = 1 -- Cost of motion
 	O = 2 -- OreTasks to send to the transporters
 
@@ -78,22 +78,27 @@ function initializeAgent()
 	end
 
 	--Agent.addAgent("base.lua", x, y) -- empty base NO explorers or transporters -- used for test
-	
-	for i=0, (N - 1) do -- For each base, initialize X + Y with certain x, y
+
+	spawnBase(0, 10, 1)
+	spawnBase(10, 0, 1)
+
+	startTime = Core.time()
+end
+
+function spawnBase(exp, trans, base)
+	for i=0, (base - 1) do -- For each base, initialize X + Y with certain x, y
 		x = Stat.randomInteger(1, ENV_HEIGHT-1)
 		y = Stat.randomInteger(1, ENV_WIDTH-1)
 
 		Agent.addAgent("base.lua", x, y)
-		for i=0, (X - 1) do
+		for i=0, (exp - 1) do
 			Agent.addAgent("explorer.lua", x, y)
 		end
 	
-		for i=0, (Y - 1) do
+		for i=0, (trans - 1) do
 			Agent.addAgent("transporter.lua", x, y)
 		end
 	end
-
-	startTime = Core.time()
 end
 
 function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)

@@ -43,6 +43,8 @@ function initializeAgent()
 	Agent.changeColor{r=255}	
 	color = {255, 0, 0}	
 
+	groupID = tostring(PositionX) .. tostring(PositionY)
+
 	-- parameters
 	energy = Shared.getNumber(1) -- current energy
 	FULL_ENERGY = Shared.getNumber(1)
@@ -53,7 +55,10 @@ function initializeAgent()
 	S = Shared.getNumber(6)
 	W = Shared.getNumber(7)
 	I = Shared.getNumber(8)
+	M = Shared.getNumber(9)
 	O = Shared.getNumber(10)
+
+	
 	doScan = false
 	base = false -- not at base (for now)
 	timeIsUp = false
@@ -75,12 +80,24 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	if eventDescription == "timesUp" then
 		timeIsUp = true
 	end
+	if eventTable["targetGroup"] ~= nil then
+		--say("E: tg" .. eventTable["targetGroup"] .. " my ID: " .. groupID)
+		senderID = eventTable["targetGroup"]
+	else
+		senderID = nil
+	end
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
 		if eventDescription == "transporterAcknowledge" and listenToAck == true then
-			--say("E: Agent #: " .. ID .. " Recieved ACK from Agent #: " .. eventTable["transporterID"])
-			transporterAckRecieved = true
-			transporterID = eventTable["transporterID"]
-			listenToAck = false
+			--say("M: " .. M)
+			if M == 0 or senderID == groupID then
+				--say("E: agree")
+				--say("E: Agent #: " .. ID .. " Recieved ACK from Agent #: " .. eventTable["transporterID"])
+				transporterAckRecieved = true
+				transporterID = eventTable["transporterID"]
+				listenToAck = false
+			else
+				--say("E: denied")
+			end
 		end
 	end
 end
@@ -121,7 +138,7 @@ function takeStep()
 			--say("E: Agent #: " .. ID .. "Sending Availability request")
 			transporterRequest = false
 			listenToAck = true
-			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="availabilityRequest"}
+			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="availabilityRequest", table = {targetGroup = groupID}}
 			energy = energy - 1
 		elseif transporterAckRecieved == true then
 			--Send acknowledgement and attatch coordinates and id of the transporter
@@ -131,6 +148,7 @@ function takeStep()
 				memTable[i] = {oreX=oreCoord[1], oreY=oreCoord[2]}
 			end
 			memTable[#memTable+1] = {ackID = transporterID} -- Attach the ID of the ack transporter
+			memTable[#memTable+1] = {targetGroup = groupID}
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="explorerAck", table = memTable}
 			energy = energy - 1
 			transporterAckRecieved = false
