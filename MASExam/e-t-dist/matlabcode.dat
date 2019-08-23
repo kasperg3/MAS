@@ -1,0 +1,184 @@
+clear;
+clc;
+
+A = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-5-5.dat");
+B = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-3-7.dat");
+C = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-7-3.dat");
+D = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-2-8.dat");
+E = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-8-2.dat");
+
+robotsAlive = [];
+AoresCollected = [];
+for i = 1:length(A)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        AoresCollected = cat(1, AoresCollected, A(i));
+    end
+end
+BoresCollected = [];
+for i = 1:length(B)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        BoresCollected = cat(1, BoresCollected, B(i));
+    end
+end
+CoresCollected = [];
+for i = 1:length(C)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        CoresCollected = cat(1, CoresCollected, C(i));
+    end
+end
+DoresCollected = [];
+for i = 1:length(D)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        DoresCollected = cat(1, DoresCollected, D(i));
+    end
+end
+EoresCollected = [];
+for i = 1:length(E)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        EoresCollected = cat(1, EoresCollected, E(i));
+    end
+end
+
+
+%mean(robotsAlive)
+Am = mean(AoresCollected)
+Bm = mean(BoresCollected)
+Cm = mean(CoresCollected)
+Dm = mean(DoresCollected)
+Em = mean(EoresCollected)
+
+
+
+%y = [Am Bm Cm Dm Em];
+%bar(y)
+%%
+A2 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-10-10.dat");
+B2 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-7-13.dat");
+C2 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-13-7.dat");
+D2 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-4-16.dat");
+E2 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-16-4.dat");
+
+A2oresCollected = [];
+for i = 1:length(A)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        A2oresCollected = cat(1, A2oresCollected, A2(i));
+    end
+end
+B2oresCollected = [];
+for i = 1:length(B)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        B2oresCollected = cat(1, B2oresCollected, B2(i));
+    end
+end
+C2oresCollected = [];
+for i = 1:length(C)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        C2oresCollected = cat(1, C2oresCollected, C2(i));
+    end
+end
+D2oresCollected = [];
+for i = 1:length(D)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        D2oresCollected = cat(1, D2oresCollected, D2(i));
+    end
+end
+E2oresCollected = [];
+for i = 1:length(E)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        E2oresCollected = cat(1, E2oresCollected, E2(i));
+    end
+end
+
+A2m = mean(A2oresCollected)
+B2m = mean(B2oresCollected)
+C2m = mean(C2oresCollected)
+D2m = mean(D2oresCollected)
+E2m = mean(E2oresCollected)
+
+%%
+A3 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-25-25.dat");
+B3 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-17-33.dat");
+C3 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-33-17.dat");
+D3 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-10-40.dat");
+E3 = importdata("/home/walsted/workspace/RANA/MAS/MASExam/e-t-dist/e-t-dist-40-10.dat");
+
+
+A3oresCollected = [];
+for i = 1:length(A)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        A3oresCollected = cat(1, A3oresCollected, A3(i));
+    end
+end
+B3oresCollected = [];
+for i = 1:length(B)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        B3oresCollected = cat(1, B3oresCollected, B3(i));
+    end
+end
+C3oresCollected = [];
+for i = 1:length(C)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        C3oresCollected = cat(1, C3oresCollected, C3(i));
+    end
+end
+D3oresCollected = [];
+for i = 1:length(D)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        D3oresCollected = cat(1, D3oresCollected, D3(i));
+    end
+end
+E3oresCollected = [];
+for i = 1:length(E)
+    if mod(i,2) == 1
+        robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        E3oresCollected = cat(1, E3oresCollected, E3(i));
+    end
+end
+
+A3m = mean(A3oresCollected)
+B3m = mean(B3oresCollected)
+C3m = mean(C3oresCollected)
+D3m = mean(D3oresCollected)
+E3m = mean(E3oresCollected)
+
+c = categorical({'10 agents','20 agents','50 agents'});
+
+y = [Am Bm Cm Dm Em ; A2m B2m C2m D2m E2m ; A3m B3m C3m D3m E3m];
+bar(c,y)
+ylabel('Ores collected (total=250) [%]')
+lgd = legend('1:1','1:2','2:1','1:4','4:1')
+title(lgd,'Ratio - e:t')
+title('Distribution test of explorers and transporters')
+
+
+
+

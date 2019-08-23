@@ -1,0 +1,54 @@
+clear;
+clc;
+
+A = importdata("/home/walsted/workspace/RANA/MAS/MASExam/energy-load-mem/load2.dat");
+B = importdata("/home/walsted/workspace/RANA/MAS/MASExam/energy-load-mem/load5.dat");
+C = importdata("/home/walsted/workspace/RANA/MAS/MASExam/energy-load-mem/load15.dat");
+
+
+robotsAlive = [];
+AoresCollected = [];
+for i = 1:length(A)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        AoresCollected = cat(1, AoresCollected, A(i));
+    end
+end
+BoresCollected = [];
+for i = 1:length(B)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        BoresCollected = cat(1, BoresCollected, B(i));
+    end
+end
+CoresCollected = [];
+for i = 1:length(C)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        CoresCollected = cat(1, CoresCollected, C(i));
+    end
+end
+
+%mean(robotsAlive)
+Am = mean(AoresCollected)
+Bm = mean(BoresCollected)
+Cm = mean(CoresCollected)
+
+
+
+
+y = [Am Bm Cm]
+
+c = categorical({'2','5','10'});
+
+bar(c,y)
+
+ylabel('Ores collected (total=250) [%]')
+xlabel('Load capacity [ores]')
+%lgd = legend('10','5','3')
+%title(lgd,'Perception scope [pixels]')
+title('Load capacity test')
+

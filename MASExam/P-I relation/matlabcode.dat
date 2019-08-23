@@ -1,0 +1,83 @@
+clear;
+clc;
+
+A = importdata("/home/walsted/workspace/RANA/MAS/MASExam/P-I relation/p-i-5-20.dat");
+B = importdata("/home/walsted/workspace/RANA/MAS/MASExam/P-I relation/p-i-5-40.dat");
+C = importdata("/home/walsted/workspace/RANA/MAS/MASExam/P-I relation/p-i-5-60.dat");
+D = importdata("/home/walsted/workspace/RANA/MAS/MASExam/P-I relation/p-i-10-20.dat");
+E = importdata("/home/walsted/workspace/RANA/MAS/MASExam/P-I relation/p-i-10-40.dat");
+F = importdata("/home/walsted/workspace/RANA/MAS/MASExam/P-I relation/p-i-10-60.dat");
+
+
+robotsAlive = [];
+AoresCollected = [];
+for i = 1:length(A)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        AoresCollected = cat(1, AoresCollected, A(i));
+    end
+end
+BoresCollected = [];
+for i = 1:length(B)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        BoresCollected = cat(1, BoresCollected, B(i));
+    end
+end
+CoresCollected = [];
+for i = 1:length(C)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        CoresCollected = cat(1, CoresCollected, C(i));
+    end
+end
+DoresCollected = [];
+for i = 1:length(D)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        DoresCollected = cat(1, DoresCollected, D(i));
+    end
+end
+EoresCollected = [];
+for i = 1:length(E)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        EoresCollected = cat(1, EoresCollected, E(i));
+    end
+end
+ForesCollected = [];
+for i = 1:length(E)
+    if mod(i,2) == 1
+        %robotsAlive = cat(1,robotsAlive, A(i));
+    else
+        ForesCollected = cat(1, ForesCollected, F(i));
+    end
+end
+
+
+%mean(robotsAlive)
+Am = mean(AoresCollected)
+Bm = mean(BoresCollected)
+Cm = mean(CoresCollected)
+Dm = mean(DoresCollected)
+Em = mean(EoresCollected)
+Fm = mean(ForesCollected)
+
+
+
+y = [Am Bm Cm ; Dm Em Fm];
+c = categorical({'40','20'});
+
+bar(c, y)
+
+ylabel('Ores collected (total=250) [%]')
+xlabel('Information scope [pixels]')
+lgd = legend('10','5','3')
+title(lgd,'Perception scope [pixels]')
+title('Perception / Information scope')
+
