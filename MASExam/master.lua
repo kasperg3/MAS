@@ -37,15 +37,15 @@ function initializeAgent()
 	
 	-- PARAMETERS from exercise	
 	D = 250-- ores
-	X = 8 -- explorer
-	Y = 2 -- transporters
+	X = 5 -- explorer
+	Y = 5 -- transporters
 	G = ENV_WIDTH -- grid
-	N = 1 -- bases
-	M = 0 -- cooperative mode -- 0 = true, 1 = false 
+	N = 5 -- bases
+	M = 1 -- cooperative mode -- 0 = true, 1 = false 
 	I = G/5-1 -- communication scope
 	P = G/20-1 -- perception scope
-	W = 5 -- limited capacity of robots
-	C = 1000 -- capacity of base
+	W = 15 -- limited capacity of robots
+	C = 50 -- capacity of base
 	E = 1000 -- energy
 	--Q = 0 -- cost of sending message
 	T = 2 -- time t to return to the base [SEC]
