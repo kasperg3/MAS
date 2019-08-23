@@ -37,13 +37,17 @@ Am = mean(AoresCollected)
 Bm = mean(BoresCollected)
 Cm = mean(CoresCollected)
 
+Av = std(AoresCollected)
+Bv = std(BoresCollected)
+Cv = std(CoresCollected)
+
 
 
 
 y = [Am Bm Cm]
 
 c = categorical({'2','5','10'});
-
+c = reordercats(c,{'2','5','10'});
 bar(c,y)
 
 ylabel('Ores collected (total=250) [%]')
@@ -51,4 +55,16 @@ xlabel('Load capacity [ores]')
 %lgd = legend('10','5','3')
 %title(lgd,'Perception scope [pixels]')
 title('Load capacity test')
+
+hold on
+
+yerr = [Am Bm Cm];
+err = [Av Bv Cv];
+x = 1:1:4;
+errorbar(yerr,err,'o','MarkerSize',10,...
+    'MarkerEdgeColor','red','MarkerFaceColor','red')    
+
+
+
+
 
