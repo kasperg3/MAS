@@ -91,7 +91,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 	if Torus.distance(sourceX, sourceY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT) < I/2 then
 		--say("des: " .. eventDescription)
 		senderID = nil
-		if eventDescription == "availabilityRequest" then
+		if eventDescription == "availabilityRequest" then -- 
 			senderID = eventTable["targetGroup"]
 			--say("T: tg" .. senderID .. " my ID " .. groupID)
 		end
@@ -102,7 +102,7 @@ function handleEvent(sourceX, sourceY, sourceID, eventDescription, eventTable)
 		--say("M: " .. M)
 		if M == 0 or senderID == groupID then -- only do this if same targetID or M == 0 (working together)
 			--say("T: agree")
-			if eventDescription == "availabilityRequest" then
+			if eventDescription == "availabilityRequest" then 
 				if memory:peek(1) == nil then 
 					respondAck = true
 					explorerID = sourceID
@@ -165,7 +165,7 @@ function takeStep()
 	local LOW_ENERGY = ENV_HEIGHT * 0.7
 	if memory:length() == 0 then oreLocated = false end
 	if Moving == false then
-		if energy < 0 then
+		if energy < 0 then -- Dead state
 			say("AGENT DIED!")
 			Event.emit{speed=1000000, description="deadAgent"}
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
@@ -184,31 +184,31 @@ function takeStep()
 				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
 				Agent.removeAgent(ID) -- remove to make space for others
 			end
-		elseif baseX == nil and baseY == nil then 			--Find base if a base is full
+		elseif baseX == nil and baseY == nil then 			--Find base state
 			if M == 0 then
 				findBase()
 			end
-		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if in base and not full energy
+		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- base state
 			energy = FULL_ENERGY
 			if unloadingOreSend == false and oreStored ~= 0 then --If in base to charge, unload ores if carrying any
 				Event.emit{sourceX = PostionX, sourceY = PositionY, sourceID = ID, speed=1000000, description="unloadingOre", table={ores=oreStored}}
 				--say("Agent #: ".. ID .. " Unloading ores " .. oreStored )
 				unloadingOreSend = true
 			end
-		elseif energy < LOW_ENERGY then 					-- If low energy return to base
+		elseif energy < LOW_ENERGY then 					-- Low energy state
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
 			energy = energy - Q 
-		elseif oreStored == W then 							-- If capacity reached, return to base
+		elseif oreStored == W then 							-- full storage (go to base state)
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
 			energy = energy - Q
 
-		elseif respondAck == true then 
+		elseif respondAck == true then -- Respond to requiest state
 			--say("T: Agent #: " .. ID .. " Respond to ACK form Agent #: " .. explorerID)
 			Event.emit{sourceX = PostionX, sourceY = PositionY, speed=1000000, description="transporterAcknowledge", table={transporterID = ID, targetGroup = groupID}}
 			respondAck = false
-		elseif oreLocated == true then 						-- If Ore located 
+		elseif oreLocated == true then 	-- "go to ore and take it if available" state	
 			if memory:length() == 0 then say("RIP") end
 			if Torus.distance(PositionX,PositionY,memory:peek()[1], memory:peek()[2], ENV_WIDTH,ENV_HEIGHT) < 2 then
 				--if Torus.compareTables(Map.checkColor(memory:peek()[1],memory:peek()[2]), {255,255,255}) then 
@@ -220,7 +220,7 @@ function takeStep()
 				Torus.move(memory:peek()[1], memory:peek()[2], G, color)
 				energy = energy - Q
 			end
-		else -- random Movement
+		else -- random Movement state
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
 				gotoY = Stat.randomInteger(0, ENV_WIDTH)

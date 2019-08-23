@@ -107,12 +107,12 @@ end
 function takeStep()
 	LOW_ENERGY = ENV_HEIGHT * 0.7
 	if Moving == false then
-		if energy < 0 then
+		if energy < 0 then -- dead state
 			say("AGENT DIED!")
 			Event.emit{speed=1000000, description="deadAgent"}
 			Map.modifyColor(PositionX,PositionY,{0,0,0})
 			Agent.removeAgent(ID)
-		elseif timeIsUp == true then
+		elseif timeIsUp == true then -- time is up "state"
 			--say("time is up")
 			if Torus.reachedDestination(baseX, baseY) == false then
 				Moving = true
@@ -124,23 +124,23 @@ function takeStep()
 				Map.modifyColor(DestinationX,DestinationY,{0,0,0})
 				Agent.removeAgent(ID) -- remove to make space for others
 			end
-		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- if base and not full energy
+		elseif Torus.distance(PositionX, PositionY, baseX, baseY, ENV_WIDTH, ENV_HEIGHT) < 2 and energy ~= FULL_ENERGY then -- base sate
 			--charge
 			energy = FULL_ENERGY
-		elseif energy < LOW_ENERGY then
+		elseif energy < LOW_ENERGY then -- low energy state
 			-- return base
 			Moving = true
 			Torus.move(baseX, baseY, G, color)
 			--say("movement: "..Q * Torus.distance(baseX, baseY, PositionX, PositionY, ENV_WIDTH, ENV_HEIGHT)
 			energy = energy - Q 
-		elseif transporterRequest == true then
+		elseif transporterRequest == true then --part of establishing state
 			--Emit a event with a availability request 
 			--say("E: Agent #: " .. ID .. "Sending Availability request")
 			transporterRequest = false
 			listenToAck = true
 			Event.emit{sourceX = PositionX, sourceY = PositionY, speed=1000000, description="availabilityRequest", table = {targetGroup = groupID}}
 			energy = energy - 1
-		elseif transporterAckRecieved == true then
+		elseif transporterAckRecieved == true then --part of establishing state
 			--Send acknowledgement and attatch coordinates and id of the transporter
 			local memTable = {}
 			for i = 1, memory:length() do 
@@ -157,7 +157,7 @@ function takeStep()
 				memory:pop()
 			end
 
-		elseif doScan == true then
+		elseif doScan == true then -- scan state
 			ores = Torus.squareSpiralTorusScanColor(P,{255,255,255}, G)
 			energy = energy - P
 			doScan = false
@@ -173,7 +173,7 @@ function takeStep()
 				end
 				ores = nil
 			end
-		else --RANDOM MOVEMENT
+		else --RANDOM MOVEMENT state
 			if Torus.reachedDestination(gotoX, gotoY) == true then
 				doScan = true
 				gotoX = Stat.randomInteger(0, ENV_HEIGHT)
